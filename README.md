@@ -1,6 +1,6 @@
 # WixmaxSimulator
 
-A interactive Simulator of Wimax(a family of wireless communication standards) based on the IEEE 802.16 set of standards
+An interactive Simulator of Wimax(a family of wireless communication standards) based on the IEEE 802.16 set of standards
 
 ## Development server
 
