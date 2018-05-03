@@ -1,6 +1,6 @@
 # WixmaxSimulator
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.6.8.
+An interactive Simulator of Wimax(a family of wireless communication standards) based on the IEEE 802.16 set of standards
 
 ## Development server
 
