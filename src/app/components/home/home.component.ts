@@ -20,6 +20,11 @@ export class HomeComponent implements OnInit {
 
   }
 
-
+  toggleTopBar() {
+    $('.sidebar').sidebar({
+      "transition": "scale out",
+      "silent":"true"
+    }).sidebar('toggle');
+  }
 
 }
