@@ -6,7 +6,7 @@
   "apps": [
     {
       "root": "src",
-      "outDir": "dist",
+      "outDir": "../out",
       "assets": [
         "assets",
         "favicon.ico"
@@ -19,9 +19,18 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
-        "styles.css"
+        "styles.css",
+        "./plugins/css/semantic.min.css",
+        "./plugins/css/calendar.min.css",
+        "./plugins/css/range.css",
+        "./plugins/css/style.css"
       ],
-      "scripts": [],
+      "scripts": [
+        "./plugins/js/jquery-3.2.1.min.js",
+        "./plugins/js/semantic.min.js",
+        "./plugins/js/calendar.min.js",
+        "./plugins/js/range.js"
+      ],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",
@@ -54,8 +63,11 @@
     }
   },
   "defaults": {
+    "serve": {
+      "port": 4202
+    },
     "styleExt": "css",
-    "component": {},
-    "port": 4202
+    "component": {}
+
   }
 }
