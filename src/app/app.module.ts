@@ -11,12 +11,6 @@ import {HomeComponent} from './components/home/home.component';
 import { AboutComponent } from './components/about/about.component';
 
 
-/*=== Angular Modules ===*/
-import { ChartsModule } from 'ng2-charts/ng2-charts';
-
-
-
-
 const appRoutes: Routes = [
   {
     path: '',
@@ -38,7 +32,6 @@ const appRoutes: Routes = [
   imports: [
     BrowserModule,
     RouterModule.forRoot(appRoutes),
-    ChartsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
