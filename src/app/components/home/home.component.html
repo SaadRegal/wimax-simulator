@@ -6,15 +6,15 @@
       </div>
     </div>
     <div class="three column divided row choices">
-      <div class="column link">
+      <div class="column link" (click)="this.backToGraph()" >
         Pie chart statistics
         <img class="ui tiny image centered" src="assets/images/pie.png">
       </div>
-      <div class="column link">
+      <div class="column link" (click)="this.backToGraph()">
         Hectogramme statistics
         <img class="ui tiny image centered" src="assets/images/histo2.png">
       </div>
-      <div class="column link">
+      <div class="column link" (click)="this.backToGraph()">
         Table statistics
         <img class="ui tiny image centered" src="assets/images/clipboard2.png">
       </div>
@@ -30,7 +30,7 @@
       <h2 class="ui header">WiMax 802.16 Simulator</h2>
 
     </div>
-    <form class="ui form">
+    <form class="ui form segment mainSegment">
       <h4 class="ui dividing header centered teal">CDMA Length</h4>
       <div class="three fields">
         <div class="field">
@@ -89,6 +89,69 @@
 </div>
 
     </form>
+
+    <div class="ui segment charts" style="display: none;">
+      <h4 class="ui header">Pie Chart</h4>
+
+      <canvas id="myChart" width="400" height="400"></canvas>
+
+
+
+    </div>
   </div>
+</div>
+
+
+
+<div class="ui bottom sidebar static overlay segment">
+<div class="ui container">
+  <table class="ui definition celled table">
+    <thead>
+    <tr>
+      <th></th>
+      <th>Attempts</th>
+      <th>Success</th>
+      <th>Waiting</th>
+      <th>Collisions</th>
+      <th>Canceled</th>
+      <th>Rejected</th>
+
+
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>RealTime</td>
+
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td>Non-RealTime</td>
+
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td>Best Effort</td>
+
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>6</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
 </div>
 
