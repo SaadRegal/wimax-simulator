@@ -19,13 +19,28 @@ export class BaseStation {
   }
 
   remakeCDMACode(user: User) {
+    // let code =user.code;
+
+    // if (code > 1 && code < this.params.CDMALimits.RT) {
+    //   return MathF.random(1, this.params.CDMALimits.RT)
+    // }
+    // if (code > this.params.maxNbTrans.RT && code < this.params.CDMALimits.NRT) {
+    //   return MathF.random(this.params.CDMALimits.RT, this.params.CDMALimits.NRT)
+    // }
+    // if (code > this.params.CDMALimits.NRT && code < this.params.CDMALimits.BE) {
+    //   return MathF.random(this.params.CDMALimits.NRT, this.params.CDMALimits.BE)
+    // }
     if (user.type == "RT") {
       return MathF.random(1, this.params.CDMALimits.RT)
-    } else if (user.type == "NRT") {
+    }
+    if (user.type == "NRT") {
       return MathF.random(this.params.CDMALimits.RT, this.params.CDMALimits.NRT)
-    } else if (user.type == "BE") {
+    }
+    if (user.type == "BE") {
       return MathF.random(this.params.CDMALimits.NRT, this.params.CDMALimits.BE)
     }
+
+
   }
 
   genUsers() {
@@ -61,6 +76,11 @@ export class BaseStation {
   connectUsers() {
     this.genUsers();
 
+    let n = MathF.random(0, this.params.nbOfUsers);
+    for (let i = 0; i < n; i++) {
+
+    }
+
     // for (let i = 0; i < this.params.nbOfIterations; i++) {
     this.checkCollision();
 
@@ -89,10 +109,10 @@ export class BaseStation {
 
       for (let userTwo of this.usersList) {
         if (userOne.code == userTwo.code && userOne.id != userTwo.id) {
-          if (userOne.backOff >= 0) {
+          userOne.nbRTrans++;
+          if (userOne.backOff == 0) {
             // Change User code
             userOne.code = this.remakeCDMACode(userOne);
-            // userOne.code = this.remakeCDMACode(userOne);
             if (userOne.type == "RT" && userOne.nbRTrans > this.params.maxNbTrans.RT) {
               userOne.isSuccess = false;
             } else if (userOne.type == "NRT" && userOne.nbRTrans > this.params.maxNbTrans.NRT) {
@@ -100,13 +120,15 @@ export class BaseStation {
             } else if (userOne.type == "BE" && userOne.nbRTrans > this.params.maxNbTrans.BE) {
               userOne.isSuccess = false;
             }
-
           } else {
             userOne.nbRTrans++;
             userOne.isInCollision = true;
+            userOne.backOff=MathF.random(3,5);
+            userTwo.isSuccess = false;
           }
         } else {
           userOne.isSuccess = true;
+
 
         }
       }
