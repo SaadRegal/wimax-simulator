@@ -13,12 +13,12 @@ declare let Chart: any;
 })
 export class HomeComponent implements OnInit {
   params: Params = {
-    nbOfUsers: 20,
+    nbOfUsers: 2000,
     nbOfIterations: 3,
     CDMALimits: {
-      RT: 5,
-      NRT: 10,
-      BE: 15
+      RT: 500,
+      NRT: 1000,
+      BE: 1500
     },
     maxNbTrans: {
       RT: 2,
@@ -41,7 +41,7 @@ export class HomeComponent implements OnInit {
     bs.params = this.params;
     bs.connectUsers();
     for (let user of bs.usersList) {
-      console.log(user.isInCollision)
+      // console.log(user.isSuccess)
     }
     console.log(bs.usersList);
   }
