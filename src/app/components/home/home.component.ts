@@ -1,4 +1,7 @@
 import {Component, OnInit} from '@angular/core';
+import {BaseStation} from "../../Classes/BaseStation";
+import {Params} from "../../Classes/BaseStation";
+// import {BaseStation} from '../../Classes/BaseStation';
 
 declare let $: any;
 declare let Chart: any;
@@ -9,15 +12,47 @@ declare let Chart: any;
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
+  params: Params = {
+    nbOfUsers: 20,
+    nbOfIterations: 3,
+    CDMALimits: {
+      RT: 5,
+      NRT: 10,
+      BE: 15
+    },
+    maxNbTrans: {
+      RT: 2,
+      NRT: 3,
+      BE: 4
+    }
+  };
 
   constructor() {
   }
 
   ngOnInit() {
     this.initUI();
+    this.RunSimulation();
+
+  }
+
+  RunSimulation() {
+    let bs = new BaseStation();
+    bs.params = this.params;
+    bs.connectUsers();
+    for (let user of bs.usersList) {
+      console.log(user.isInCollision)
+    }
+    console.log(bs.usersList);
+  }
 
 
-
+//UI
+  initUI() {
+    $("input").on("focus", function () {
+      // $('.sidebar.bottom').sidebar({"dimPage":"false"}).sidebar('show');
+      $('.sidebar.bottom').transition('fade in')
+    });
     var ctx = document.getElementById("myChart");
     var myChart = new Chart(ctx, {
       type: 'bar',
@@ -49,7 +84,7 @@ export class HomeComponent implements OnInit {
         scales: {
           yAxes: [{
             ticks: {
-              beginAtZero:true
+              beginAtZero: true
             }
           }]
         }
@@ -57,38 +92,29 @@ export class HomeComponent implements OnInit {
     });
 
 
-
-
-  }
-
-  initUI() {
-    $( "input" ).on( "focus", function() {
-      // $('.sidebar.bottom').sidebar({"dimPage":"false"}).sidebar('show');
-      $('.sidebar.bottom').transition('fade in')
-    });
-
   }
 
   toggleTopBar() {
     $('.sidebar.top').sidebar({
       "transition": "scale out",
-      "silent":"true"
+      "silent": "true"
     }).sidebar('show');
 
   }
 
-  backToGraph(){
+  backToGraph() {
     $('.sidebar.top').sidebar({
-      "transition":"scale out",
+      "transition": "scale out",
     }).sidebar('hide').sidebar({
-      onHidden:$('.mainSegment').transition({
-        animation:"fade out",
-        onHidden:$('.charts').transition({duration:'1s'})
+      onHidden: $('.mainSegment').transition({
+        animation: "fade out",
+        onHidden: $('.charts').transition({duration: '1s'})
       })
-        // .transition({
-        // "onComplete":$('.charts').transition('fade in')
+      // .transition({
+      // "onComplete":$('.charts').transition('fade in')
       // })
     });
   }
+
 
 }
