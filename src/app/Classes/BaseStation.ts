@@ -63,7 +63,7 @@ export class BaseStation {
       let user: User = {
         id: i,
         code: code,
-        backOff: null,
+        backOff: 0,
         isInCollision: false,
         isSuccess: false,
         type: props.type,
@@ -75,7 +75,7 @@ export class BaseStation {
 
   connectUsers() {
     this.genUsers();
-
+// q denotes Quantity of user
     let n = MathF.random(0, this.params.nbOfUsers);
     for (let i = 0; i < n; i++) {
 
@@ -90,6 +90,7 @@ export class BaseStation {
   }
 
   checkCollision() {
+
     // let n = MathF.random(1, this.params.CDMALimits.BE);
     // for (let i = 0; i < n; i++) {
 
@@ -104,12 +105,12 @@ export class BaseStation {
     //     }
     //   });
     // });
+    for (let c=0 ; c<this.params.nbOfCycles;c++) {
 
     for (let userOne of this.usersList) {
 
       for (let userTwo of this.usersList) {
         if (userOne.code == userTwo.code && userOne.id != userTwo.id) {
-          userOne.nbRTrans++;
           if (userOne.backOff == 0) {
             // Change User code
             userOne.code = this.remakeCDMACode(userOne);
@@ -120,11 +121,14 @@ export class BaseStation {
             } else if (userOne.type == "BE" && userOne.nbRTrans > this.params.maxNbTrans.BE) {
               userOne.isSuccess = false;
             }
-          } else {
-            userOne.nbRTrans++;
-            userOne.isInCollision = true;
-            userOne.backOff=MathF.random(3,5);
-            userTwo.isSuccess = false;
+            else {
+              userOne.nbRTrans++;
+              userOne.isInCollision = true;
+              userOne.backOff = MathF.random(3, 5);
+              // userTwo.isSuccess = false;
+            }
+          } else if(userOne.backOff>0) {
+           userOne.backOff--;
           }
         } else {
           userOne.isSuccess = true;
@@ -133,6 +137,7 @@ export class BaseStation {
         }
       }
     }
+  }
     // }
 
     // }
@@ -142,7 +147,7 @@ export class BaseStation {
 
 export interface Params {
   nbOfUsers: number,
-  nbOfIterations: number,
+  nbOfCycles: number,
   CDMALimits: {
     RT: number,
     NRT: number,

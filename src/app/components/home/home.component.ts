@@ -14,7 +14,7 @@ declare let Chart: any;
 export class HomeComponent implements OnInit {
   params: Params = {
     nbOfUsers: 2000,
-    nbOfIterations: 3,
+    nbOfCycles: 3,
     CDMALimits: {
       RT: 500,
       NRT: 1000,
