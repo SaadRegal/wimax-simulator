@@ -105,39 +105,81 @@ export class BaseStation {
     //     }
     //   });
     // });
+  //   for (let c=0 ; c<this.params.nbOfCycles;c++) {
+  //     // let n = MathF.random(0, this.params.nbOfUsers);
+  //     let n =600;
+  //
+  //     let start=n*c;
+  //     let end= n*(c+1);
+  //
+  //   for (let userOne of this.usersList.slice(start,end)) {
+  //
+  //     for (let userTwo of this.usersList.slice(start,end)) {
+  //       if (userOne.code == userTwo.code && userOne.id != userTwo.id) {
+  //         if (userOne.backOff == 0) {
+  //           // Change User code
+  //           userOne.code = this.remakeCDMACode(userOne);
+  //           if (userOne.type == "RT" && userOne.nbRTrans > this.params.maxNbTrans.RT) {
+  //             userOne.isSuccess = false;
+  //           } else if (userOne.type == "NRT" && userOne.nbRTrans > this.params.maxNbTrans.NRT) {
+  //             userOne.isSuccess = false;
+  //           } else if (userOne.type == "BE" && userOne.nbRTrans > this.params.maxNbTrans.BE) {
+  //             userOne.isSuccess = false;
+  //           }
+  //           else {
+  //             userOne.nbRTrans++;
+  //             userOne.isInCollision = true;
+  //             userOne.backOff = MathF.random(3,5);
+  //             // userTwo.isSuccess = false;
+  //           }
+  //         } else if(userOne.backOff>0) {
+  //          userOne.backOff--;
+  //         }
+  //       } else {
+  //         userOne.isSuccess = true;
+  //
+  //
+  //       }
+  //     }
+  //   }
+  // }
     for (let c=0 ; c<this.params.nbOfCycles;c++) {
+      // let n = MathF.random(0, this.params.nbOfUsers);
+      let n =1000;
 
-    for (let userOne of this.usersList) {
+      let start=n*c;
+      let end= n*(c+1);
 
-      for (let userTwo of this.usersList) {
-        if (userOne.code == userTwo.code && userOne.id != userTwo.id) {
-          if (userOne.backOff == 0) {
-            // Change User code
-            userOne.code = this.remakeCDMACode(userOne);
-            if (userOne.type == "RT" && userOne.nbRTrans > this.params.maxNbTrans.RT) {
-              userOne.isSuccess = false;
-            } else if (userOne.type == "NRT" && userOne.nbRTrans > this.params.maxNbTrans.NRT) {
-              userOne.isSuccess = false;
-            } else if (userOne.type == "BE" && userOne.nbRTrans > this.params.maxNbTrans.BE) {
-              userOne.isSuccess = false;
+      for (let userOne of this.usersList.slice(start,end)) {
+        for (let userTwo of this.usersList.slice(start,end)) {
+          if (userOne.code == userTwo.code && userOne.id != userTwo.id) {
+            if (userOne.backOff == 0) {
+              // Change User code
+              userOne.code = this.remakeCDMACode(userOne);
+              if (userOne.type == "RT" && userOne.nbRTrans > this.params.maxNbTrans.RT) {
+                userOne.isSuccess = false;
+              } else if (userOne.type == "NRT" && userOne.nbRTrans > this.params.maxNbTrans.NRT) {
+                userOne.isSuccess = false;
+              } else if (userOne.type == "BE" && userOne.nbRTrans > this.params.maxNbTrans.BE) {
+                userOne.isSuccess = false;
+              }
+              else {
+                userOne.nbRTrans++;
+                userOne.isInCollision = true;
+                userOne.backOff = MathF.random(3,5);
+                userTwo.isSuccess = false;
+              }
+            } else if(userOne.backOff>0) {
+              userOne.backOff--;
             }
-            else {
-              userOne.nbRTrans++;
-              userOne.isInCollision = true;
-              userOne.backOff = MathF.random(3, 5);
-              // userTwo.isSuccess = false;
-            }
-          } else if(userOne.backOff>0) {
-           userOne.backOff--;
+          } else {
+            userOne.isSuccess = true;
+
+
           }
-        } else {
-          userOne.isSuccess = true;
-
-
         }
       }
     }
-  }
     // }
 
     // }

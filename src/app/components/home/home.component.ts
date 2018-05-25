@@ -13,12 +13,12 @@ declare let Chart: any;
 })
 export class HomeComponent implements OnInit {
   params: Params = {
-    nbOfUsers: 2000,
-    nbOfCycles: 3,
+    nbOfUsers: 5000,
+    nbOfCycles: 1000,
     CDMALimits: {
       RT: 500,
-      NRT: 1000,
-      BE: 1500
+      NRT: 100,
+      BE: 150
     },
     maxNbTrans: {
       RT: 2,
@@ -36,13 +36,31 @@ export class HomeComponent implements OnInit {
 
   }
 
+
   RunSimulation() {
     let bs = new BaseStation();
     bs.params = this.params;
     bs.connectUsers();
     for (let user of bs.usersList) {
       // console.log(user.isSuccess)
+
+      if(!user.isSuccess){console.log(user.isSuccess)}
+      // if (!user.isSuccess){console.log('succe')}
+      // if (!user.isInCollision){console.log('boy')}
     }
+
+    for (let user of bs.usersList) {
+      if(user.isSuccess){console.log(user.isSuccess)}
+      // if (!user.isSuccess){console.log('yeah')}
+      // if (!user.isInCollision){console.log('coll')}
+    }
+
+    for (let user of bs.usersList) {
+      if(user.isInCollision){console.log(user.isInCollision)}
+      // if (!user.isSuccess){console.log('yeah')}
+      // if (!user.isInCollision){console.log('coll')}
+    }
+
     console.log(bs.usersList);
   }
 
