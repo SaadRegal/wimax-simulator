@@ -24,72 +24,101 @@
 
 <!--<a (click)="this.toggleTopBar()">submit</a>-->
 
-<div class="ui container" style="margin-top: 50px">
+<div class="ui container" style="margin-top: 5px">
   <div class="ui segment">
     <div class="ui blue center aligned segment">
       <h2 class="ui header">WiMax 802.16 Simulator</h2>
 
     </div>
-    <form class="ui form segment mainSegment">
-      <h4 class="ui dividing header centered teal">CDMA Length</h4>
-      <div class="three fields">
-        <div class="field">
-          <label>RealTime</label>
-          <div class="ui input icon">
-            <input placeholder="length value" name="crt" type="text">
-          </div>
-        </div>
-        <div class="field">
-          <label>Non-RealTime</label>
-          <div class="ui input icon">
-            <input placeholder="length value" name="cnrt" type="text">
-          </div>
-        </div>
-        <div class="field">
-          <label>BestEffort</label>
-          <div class="ui input icon">
-            <input placeholder="length value" name="cbe" type="text">
-          </div>
-        </div>
-      </div>
-      <h4 class="ui dividing header centered violet">Simulation parameters</h4>
-      <div class="three fields">
-        <div class="field">
-          <label>Maximal Retransmission number</label>
-          <div class="ui input icon">
-            <input placeholder="length value" name="crt" type="text">
-          </div>
-        </div>
-        <div class="field">
-          <label>Pool size</label>
-          <div class="ui input icon">
-            <input placeholder="length value" name="cnrt" type="text">
-          </div>
-        </div>
-        <div class="field">
-          <label>BestEffort</label>
-          <div class="ui input icon">
-            <input placeholder="length value" name="cbe" type="text">
-          </div>
-        </div>
-      </div>
-      <div class="ui three column centered grid">
-        <div class="column">
-          <div class="field">
-            <label>Total number of users</label>
-            <div class="ui input icon">
-              <input placeholder="Nb of users" name="nbUsers" type="number">
+
+
+      <form class="ui form segment mainSegment">
+        <div class="ui three column grid">
+          <div class="row">
+            <div class="column">
+              <h4 class="ui dividing header centered teal">CDMA Length</h4>
+                <div class="field">
+                  <label>RealTime</label>
+                  <div class="ui input icon">
+                    <input [(ngModel)]="params.CDMALimits.RT" placeholder="length value" name="crt" type="text">
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Non-RealTime</label>
+                  <div class="ui input icon">
+                    <input [(ngModel)]="params.CDMALimits.NRT" placeholder="length value" name="cnrt" type="text">
+                  </div>
+                </div>
+                <div class="field">
+                  <label>BestEffort</label>
+                  <div class="ui input icon">
+                    <input [(ngModel)]="params.CDMALimits.BE" placeholder="length value" name="cbe" type="text">
+                  </div>
+                </div>
+
+            </div>
+            <div class="column">
+              <h4 class="ui dividing header centered teal">Maximal Retransmission number</h4>
+                <div class="field">
+                  <label>RealTime</label>
+                  <div class="ui input icon">
+                    <input [(ngModel)]="params.maxNbTrans.RT"  placeholder="value" name="mrrt" type="text">
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Non-RealTime</label>
+                  <div class="ui input icon">
+                    <input [(ngModel)]="params.maxNbTrans.NRT" placeholder="value" name="mrnrt" type="text">
+                  </div>
+                </div>
+                <div class="field">
+                  <label>BestEffort</label>
+                  <div class="ui input icon">
+                    <input [(ngModel)]="params.maxNbTrans.BE" placeholder="value" name="mrbe" type="text">
+                  </div>
+                </div>
+            </div>
+            <div class="column">
+              <h4 class="ui dividing header centered violet">Simulation parameters</h4>
+              <div class="field">
+                <label>Maximal Retransmission number</label>
+                <div class="ui input icon">
+                  <input placeholder="length value" name="crt" type="text">
+                </div>
+              </div>
+              <div class="field">
+                <label>Pool size</label>
+                <div class="ui input icon">
+                  <input placeholder="length value" name="cnrt" type="text">
+                </div>
+              </div>
+              <div class="field">
+                <label>BestEffort</label>
+                <div class="ui input icon">
+                  <input placeholder="length value" name="cbe" type="text">
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-<div class="ui primary right labeled icon button" (click)="this.toggleTopBar()">
-  Let's roll
-  <i class="bomb icon"></i>
+        <div class="ui three column centered grid">
+          <div class="column">
+            <div class="field">
+              <label>Total number of users</label>
+              <div class="ui input icon">
+                <input [(ngModel)]="params.nbOfUsers" placeholder="Nb of users" name="nbUsers" type="number">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ui primary right labeled icon button" (click)="this.toggleTopBar()">
+          Let's roll
+          <i class="bomb icon"></i>
+        </div>
+
+      </form>
+    </div>
 </div>
-
-    </form>
-
     <div class="ui segment charts" style="display: none;">
       <h4 class="ui header">Pie Chart</h4>
 
@@ -98,8 +127,7 @@
 
 
     </div>
-  </div>
-</div>
+
 
 
 

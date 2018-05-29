@@ -3,6 +3,7 @@ import {BaseStation} from "../../Classes/BaseStation";
 import {Params} from "../../Classes/BaseStation";
 // import {BaseStation} from '../../Classes/BaseStation';
 
+
 declare let $: any;
 declare let Chart: any;
 
@@ -13,8 +14,8 @@ declare let Chart: any;
 })
 export class HomeComponent implements OnInit {
   params: Params = {
-    nbOfUsers: 5000,
-    nbOfCycles: 1000,
+    nbOfUsers: 50,
+    nbOfCycles: 3,
     CDMALimits: {
       RT: 500,
       NRT: 100,
