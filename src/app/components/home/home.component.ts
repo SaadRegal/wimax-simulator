@@ -3,7 +3,6 @@ import {BaseStation} from "../../Classes/BaseStation";
 import {Params} from "../../Classes/BaseStation";
 // import {BaseStation} from '../../Classes/BaseStation';
 
-
 declare let $: any;
 declare let Chart: any;
 
@@ -14,12 +13,12 @@ declare let Chart: any;
 })
 export class HomeComponent implements OnInit {
   params: Params = {
-    nbOfUsers: 50,
-    nbOfCycles: 3,
+    nbOfUsers: 200,
+    nbOfCycles: 5,
     CDMALimits: {
-      RT: 500,
-      NRT: 100,
-      BE: 150
+      RT: 100,
+      NRT: 150,
+      BE: 200
     },
     maxNbTrans: {
       RT: 2,
@@ -45,22 +44,39 @@ export class HomeComponent implements OnInit {
     for (let user of bs.usersList) {
       // console.log(user.isSuccess)
 
-      if(!user.isSuccess){console.log(user.isSuccess)}
+      if(user.isSuccess=='false'){console.log(user.isSuccess)}
       // if (!user.isSuccess){console.log('succe')}
       // if (!user.isInCollision){console.log('boy')}
     }
 
     for (let user of bs.usersList) {
-      if(user.isSuccess){console.log(user.isSuccess)}
+      if(user.isSuccess=='true'){console.log(user.isSuccess)}
       // if (!user.isSuccess){console.log('yeah')}
       // if (!user.isInCollision){console.log('coll')}
     }
 
     for (let user of bs.usersList) {
-      if(user.isInCollision){console.log(user.isInCollision)}
+      if(user.isSuccess=='notYet'){console.log(user.isSuccess)}
       // if (!user.isSuccess){console.log('yeah')}
       // if (!user.isInCollision){console.log('coll')}
     }
+
+    for (let user of bs.usersList) {
+      if(user.isInCollision){console.log('collisions',user.isInCollision)}
+      // if (!user.isSuccess){console.log('yeah')}
+      // if (!user.isInCollision){console.log('coll')}
+    }
+
+    console.info('validating ...');
+    let c=0;
+    for(let userOne of bs.usersList){
+      for(let userTwo of bs.usersList){
+        if(userOne.code == userTwo.code && userOne.id!=userTwo.id){
+          c++;
+        }
+      }
+    }
+    console.warn(c,'collision');
 
     console.log(bs.usersList);
   }
