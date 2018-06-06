@@ -14,17 +14,18 @@ declare let Chart: any;
 export class HomeComponent implements OnInit {
   params: Params = {
     nbOfUsers: 200,
-    nbOfCycles: 5,
+    nbOfCycles: 500,
     CDMALimits: {
-      RT: 100,
-      NRT: 150,
+      RT: 75,
+      NRT: 175,
       BE: 200
     },
     maxNbTrans: {
       RT: 2,
       NRT: 3,
       BE: 4
-    }
+    },
+    stats:{currentCycle:1}
   };
 
   constructor() {
@@ -50,19 +51,19 @@ export class HomeComponent implements OnInit {
     }
 
     for (let user of bs.usersList) {
-      if(user.isSuccess=='true'){console.log(user.isSuccess)}
+      // if(user.isSuccess=='true'){console.log(user.isSuccess)}
       // if (!user.isSuccess){console.log('yeah')}
       // if (!user.isInCollision){console.log('coll')}
     }
 
     for (let user of bs.usersList) {
-      if(user.isSuccess=='notYet'){console.log(user.isSuccess)}
+      // if(user.isSuccess=='notYet'){console.log(user.isSuccess)}
       // if (!user.isSuccess){console.log('yeah')}
       // if (!user.isInCollision){console.log('coll')}
     }
 
     for (let user of bs.usersList) {
-      if(user.isInCollision){console.log('collisions',user.isInCollision)}
+      // if(user.isInCollision){console.log('collisions',user.isInCollision)}
       // if (!user.isSuccess){console.log('yeah')}
       // if (!user.isInCollision){console.log('coll')}
     }
@@ -72,6 +73,7 @@ export class HomeComponent implements OnInit {
     for(let userOne of bs.usersList){
       for(let userTwo of bs.usersList){
         if(userOne.code == userTwo.code && userOne.id!=userTwo.id){
+          // console.log(userOne.code,userOne,userTwo.code,userTwo)
           c++;
         }
       }
@@ -79,6 +81,7 @@ export class HomeComponent implements OnInit {
     console.warn(c,'collision');
 
     console.log(bs.usersList);
+    // console.log(bs.failedList);
   }
 
 

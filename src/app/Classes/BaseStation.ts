@@ -4,15 +4,15 @@ import {Utils} from "./Utils";
 export class BaseStation {
   usersList: Array<User> = [];
   waitingList: Array<User> = [];
+  failedList: Array<User> = [];
   attempts: number;
-  successUsersList: Array<User>;
   CDMALength: number;
   delay: number;
   cycles: number = 0;
   backOff: number;
   list: Array<number>;
   params: Params;
-  stats: Stats;
+  history: History;
 
 
   constructor() {
@@ -205,34 +205,47 @@ export class BaseStation {
     // }
 
     // }
+    let position = 0;
     for (let c = 0; c < this.params.nbOfCycles; c++) {
+      let n = Utils.random(0, this.usersList.length);
+      let start = position;
+      while (position <= this.usersList.length) {
+        position = position + n;
+      }
+      // console.log('n',n,'start',start,'position',position);
 
-      this.usersList.forEach((fv, fi, fArray) => {
-        if (fArray[fi].backOff > 0) {
-          fArray[fi].backOff--;
-        } else if (fArray[fi].backOff==0) {
-          this.usersList.forEach((sv, si, sArray) => {
-            if (fArray[fi].code == sArray[si].code && fArray[fi].id != sArray[si].id && fArray[fi].isSuccess!='false') {
-
-              if (this.isTimeout(fArray[fi])) {
-                fArray[fi].isSuccess = 'false';
-              } else {
-                this.waitingList.push(fArray[fi]);
-                Utils.rmv(fArray[fi],this.usersList)
-
-                // fArray[fi].isInCollision = true;
-                // fArray[fi].nbRTrans++;
-                // fArray[fi].code = this.remakeCDMACode(fArray[fi]);
-                // fArray[fi].backOff = Utils.random(3, 7);
-              }
-
-            } else if(fArray[fi].code != sArray[si].code) {
-              this.usersList[fi].isSuccess = 'true';
-            }
-          });
+      for (let user of this.waitingList) {
+        if (this.isTimeout(user)) {
+          this.failedList.push(user);
+          Utils.rmv(user, this.waitingList);
+        } else {
+          if (user.backOff > 0 && user) {
+            user.backOff--;
+          } else if (user.backOff == 0) {
+            this.usersList.push(user);
+            Utils.rmv(user, this.usersList);
+          }
         }
-      });
+      }
+      for (let userOne of this.usersList.slice(start, position)) {
+        for (let userTwo of this.usersList.slice(start, position)) {
+          if (userOne.code == userTwo.code && userOne.id != userTwo.id) {
+            userOne.nbRTrans++;
+            userOne.backOff = Utils.random(3, 7);
+            userOne.code = this.remakeCDMACode(userOne);
+            this.waitingList.push(userOne);
+            Utils.rmv(userOne, this.usersList);
+          }
+        }
+      }
+      // Statistics
+
+
     }
+
+  }
+  recordHistory(){
+
   }
 
   isTimeout(user: User) {
@@ -266,6 +279,9 @@ export interface Params {
     NRT: number,
     BE: number
   }
+  stats:{
+    currentCycle:number
+  }
 }
 
 interface Props {
@@ -274,10 +290,19 @@ interface Props {
 
 }
 
-interface Stats {
+interface History {
   cycle: number,
   user: {
-    RT: { collisions, backOffs, attempts, success }
+    RT: Events,
+    NRT: Events,
+    BE: Events
   }
 
+}
+
+interface Events {
+  collisions:number,
+  backOffs:number,
+  attempts:number,
+  success:number
 }
