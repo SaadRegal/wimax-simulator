@@ -1,6 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {BaseStation} from "../../Classes/BaseStation";
 import {Params} from "../../Classes/BaseStation";
+import {Events} from "../../Classes/BaseStation";
+import {Stats} from "../../Classes/BaseStation";
+import {Utils} from "../../Classes/Utils";
 // import {BaseStation} from '../../Classes/BaseStation';
 
 declare let $: any;
@@ -14,7 +17,7 @@ declare let Chart: any;
 export class HomeComponent implements OnInit {
   params: Params = {
     nbOfUsers: 200,
-    nbOfCycles: 500,
+    nbOfCycles: 900,
     CDMALimits: {
       RT: 75,
       NRT: 175,
@@ -25,7 +28,15 @@ export class HomeComponent implements OnInit {
       NRT: 3,
       BE: 4
     },
-    stats:{currentCycle:1}
+    stats: {currentCycle: 1}
+  };
+
+  stats: Stats = {
+    user: {
+      RT: {collisions: 0, attempts: 0, backOffs: 0, success: 0, canceled: 0},
+      NRT: {collisions: 0, attempts: 0, backOffs: 0, success: 0, canceled: 0},
+      BE: {collisions: 0, attempts: 0, backOffs: 0, success: 0, canceled: 0}
+    }
   };
 
   constructor() {
@@ -39,13 +50,16 @@ export class HomeComponent implements OnInit {
 
 
   RunSimulation() {
+    this.initResult();
     let bs = new BaseStation();
     bs.params = this.params;
     bs.connectUsers();
     for (let user of bs.usersList) {
       // console.log(user.isSuccess)
 
-      if(user.isSuccess=='false'){console.log(user.isSuccess)}
+      if (user.isSuccess == 'false') {
+        console.log(user.isSuccess)
+      }
       // if (!user.isSuccess){console.log('succe')}
       // if (!user.isInCollision){console.log('boy')}
     }
@@ -68,29 +82,110 @@ export class HomeComponent implements OnInit {
       // if (!user.isInCollision){console.log('coll')}
     }
 
-    console.info('validating ...');
-    let c=0;
-    for(let userOne of bs.usersList){
-      for(let userTwo of bs.usersList){
-        if(userOne.code == userTwo.code && userOne.id!=userTwo.id){
-          // console.log(userOne.code,userOne,userTwo.code,userTwo)
-          c++;
-        }
+    // console.info('validating ...');
+    // let c = 0;
+    // for (let userOne of bs.usersList) {
+    //   for (let userTwo of bs.usersList) {
+    //     if (userOne.code == userTwo.code && userOne.id != userTwo.id) {
+    //       // console.log(userOne.code,userOne,userTwo.code,userTwo)
+    //       c++;
+    //     }
+    //   }
+    // }
+    // console.warn(c, 'collision');
+
+    // console.log(bs.usersList);
+    // console.log(bs.waitingList);
+    // console.log(bs.failedList);
+    this.initialStats(bs);
+  }
+
+  initResult(){
+    this.stats={
+      user: {
+        RT: {collisions: 0, attempts: 0, backOffs: 0, success: 0, canceled: 0},
+        NRT: {collisions: 0, attempts: 0, backOffs: 0, success: 0, canceled: 0},
+        BE: {collisions: 0, attempts: 0, backOffs: 0, success: 0, canceled: 0}
       }
     }
-    console.warn(c,'collision');
+  }
 
-    console.log(bs.usersList);
-    // console.log(bs.failedList);
+  initialStats(bs: BaseStation) {
+    let globalList: Array<User> = [];
+    globalList = globalList.concat(bs.failedList, bs.usersList, bs.usersList);
+    // for(let user of bs.usersList){
+    //   globalList.push(user);
+    // }
+    // for(let user of bs.waitingList){
+    //   globalList.push(user);
+    // }
+    // for(let user of bs.failedList){
+    //   globalList.push(user);
+    // }
+    // console.log(globalList);
+// Success count
+//     for (let user of bs.usersList) {
+//       if (user.type == 'RT') {
+//         this.stats.user.RT.success++
+//       }
+//       if (user.type == 'NRT') {
+//         this.stats.user.RT.success++
+//       }
+//       if (user.type == 'BE') {
+//         this.stats.user.RT.success++
+//       }
+//     }
+
+    let count = Utils.countByType(bs.failedList, "type");
+    this.stats.user.RT.canceled = count.RT;
+    this.stats.user.NRT.canceled = count.NRT;
+    this.stats.user.BE.canceled = count.BE;
+
+    count = Utils.countByType(bs.collisionHistory, "type");
+    this.stats.user.RT.collisions = count.RT;
+    this.stats.user.NRT.collisions = count.NRT;
+    this.stats.user.BE.collisions = count.BE;
+
+    count = Utils.countByType(bs.usersList, "type");
+    this.stats.user.RT.success = count.RT;
+    this.stats.user.NRT.success = count.NRT;
+    this.stats.user.BE.success = count.BE;
+
+    // backOff and attempts count
+    for (let user of globalList) {
+
+      if (user.type == 'RT') {
+        this.stats.user.RT.attempts += user.nbRTrans;
+        this.stats.user.RT.backOffs += user.backOff;
+      }
+
+      if (user.type == 'NRT') {
+        this.stats.user.NRT.attempts += user.nbRTrans;
+        this.stats.user.NRT.backOffs += user.backOff;
+      }
+
+      if (user.type == 'BE') {
+        this.stats.user.BE.attempts += user.nbRTrans;
+        this.stats.user.BE.backOffs += user.backOff;
+      }
+
+    }
+
   }
 
 
 //UI
   initUI() {
-    $("input").on("focus", function () {
+    $("input").on("focus",() =>{
       // $('.sidebar.bottom').sidebar({"dimPage":"false"}).sidebar('show');
-      $('.sidebar.bottom').transition('fade in')
+      $('.sidebar.bottom').transition('fade in');
+
+      this.RunSimulation();
     });
+
+
+
+
     var ctx = document.getElementById("myChart");
     var myChart = new Chart(ctx, {
       type: 'bar',

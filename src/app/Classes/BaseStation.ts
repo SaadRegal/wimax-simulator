@@ -13,6 +13,7 @@ export class BaseStation {
   list: Array<number>;
   params: Params;
   history: History;
+  collisionHistory: Array<User> = [];
 
 
   constructor() {
@@ -231,6 +232,7 @@ export class BaseStation {
         for (let userTwo of this.usersList.slice(start, position)) {
           if (userOne.code == userTwo.code && userOne.id != userTwo.id) {
             userOne.nbRTrans++;
+            this.collisionHistory.push(userOne);
             userOne.backOff = Utils.random(3, 7);
             userOne.code = this.remakeCDMACode(userOne);
             this.waitingList.push(userOne);
@@ -238,7 +240,6 @@ export class BaseStation {
           }
         }
       }
-      // Statistics
 
 
     }
@@ -250,17 +251,18 @@ export class BaseStation {
 
   isTimeout(user: User) {
     if (user.type == "RT" && user.nbRTrans >= this.params.maxNbTrans.RT) {
-      // user.isSuccess = 'false';
       return true;
     } else if (user.type == "NRT" && user.nbRTrans >= this.params.maxNbTrans.NRT) {
-      // user.isSuccess = 'false';
       return true;
     } else if (user.type == "BE" && user.nbRTrans >= this.params.maxNbTrans.BE) {
-      // user.isSuccess = 'false';
       return true;
     } else {
       return false
     }
+
+  }
+
+  collisionCount(){
 
   }
 
@@ -300,9 +302,18 @@ interface History {
 
 }
 
-interface Events {
+export interface Events {
   collisions:number,
   backOffs:number,
   attempts:number,
-  success:number
+  success:number,
+  canceled:number,
+}
+
+export interface Stats {
+  user: {
+    RT: Events,
+    NRT: Events,
+    BE: Events
+  }
 }

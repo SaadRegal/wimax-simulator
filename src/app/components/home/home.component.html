@@ -6,7 +6,7 @@
       </div>
     </div>
     <div class="three column divided row choices">
-      <div class="column link" (click)="this.backToGraph()" >
+      <div class="column link" (click)="this.backToGraph()">
         Pie chart statistics
         <img class="ui tiny image centered" src="assets/images/pie.png">
       </div>
@@ -32,164 +32,154 @@
     </div>
 
 
-      <form class="ui form segment mainSegment">
-        <div class="ui three column grid">
-          <div class="row">
-            <div class="column">
-              <h4 class="ui dividing header centered teal">CDMA Length</h4>
-                <div class="field">
-                  <label>RealTime</label>
-                  <div class="ui input icon">
-                    <input [(ngModel)]="params.CDMALimits.RT" placeholder="length value" name="crt" type="text">
-                  </div>
-                </div>
-                <div class="field">
-                  <label>Non-RealTime</label>
-                  <div class="ui input icon">
-                    <input [(ngModel)]="params.CDMALimits.NRT" placeholder="length value" name="cnrt" type="text">
-                  </div>
-                </div>
-                <div class="field">
-                  <label>BestEffort</label>
-                  <div class="ui input icon">
-                    <input [(ngModel)]="params.CDMALimits.BE" placeholder="length value" name="cbe" type="text">
-                  </div>
-                </div>
-
-            </div>
-            <div class="column">
-              <h4 class="ui dividing header centered teal">Maximal Retransmission number</h4>
-                <div class="field">
-                  <label>RealTime</label>
-                  <div class="ui input icon">
-                    <input [(ngModel)]="params.maxNbTrans.RT"  placeholder="value" name="mrrt" type="text">
-                  </div>
-                </div>
-                <div class="field">
-                  <label>Non-RealTime</label>
-                  <div class="ui input icon">
-                    <input [(ngModel)]="params.maxNbTrans.NRT" placeholder="value" name="mrnrt" type="text">
-                  </div>
-                </div>
-                <div class="field">
-                  <label>BestEffort</label>
-                  <div class="ui input icon">
-                    <input [(ngModel)]="params.maxNbTrans.BE" placeholder="value" name="mrbe" type="text">
-                  </div>
-                </div>
-            </div>
-            <div class="column">
-              <h4 class="ui dividing header centered violet">Simulation parameters</h4>
-              <div class="field">
-                <label>Maximal Retransmission number</label>
-                <div class="ui input icon">
-                  <input placeholder="length value" name="crt" type="text">
-                </div>
-              </div>
-              <div class="field">
-                <label>Pool size</label>
-                <div class="ui input icon">
-                  <input placeholder="length value" name="cnrt" type="text">
-                </div>
-              </div>
-              <div class="field">
-                <label>BestEffort</label>
-                <div class="ui input icon">
-                  <input placeholder="length value" name="cbe" type="text">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="ui three column centered grid">
+    <form class="ui form segment mainSegment">
+      <div class="ui three column grid">
+        <div class="row">
           <div class="column">
+            <h4 class="ui dividing header centered teal">CDMA Length</h4>
             <div class="field">
-              <label>Total number of users</label>
+              <label>RealTime</label>
               <div class="ui input icon">
-                <input [(ngModel)]="params.nbOfUsers" placeholder="Nb of users" name="nbUsers" type="number">
+                <input [(ngModel)]="params.CDMALimits.RT" placeholder="length value" name="crt" type="text">
+              </div>
+            </div>
+            <div class="field">
+              <label>Non-RealTime</label>
+              <div class="ui input icon">
+                <input [(ngModel)]="params.CDMALimits.NRT" placeholder="length value" name="cnrt" type="text">
+              </div>
+            </div>
+            <div class="field">
+              <label>BestEffort</label>
+              <div class="ui input icon">
+                <input [(ngModel)]="params.CDMALimits.BE" placeholder="length value" name="cbe" type="text">
+              </div>
+            </div>
+
+          </div>
+          <div class="column">
+            <h4 class="ui dividing header centered teal">Maximal Retransmission number</h4>
+            <div class="field">
+              <label>RealTime</label>
+              <div class="ui input icon">
+                <input [(ngModel)]="params.maxNbTrans.RT" placeholder="value" name="mrrt" type="text">
+              </div>
+            </div>
+            <div class="field">
+              <label>Non-RealTime</label>
+              <div class="ui input icon">
+                <input [(ngModel)]="params.maxNbTrans.NRT" placeholder="value" name="mrnrt" type="text">
+              </div>
+            </div>
+            <div class="field">
+              <label>BestEffort</label>
+              <div class="ui input icon">
+                <input [(ngModel)]="params.maxNbTrans.BE" placeholder="value" name="mrbe" type="text">
+              </div>
+            </div>
+          </div>
+          <div class="column">
+            <h4 class="ui dividing header centered violet">Simulation parameters</h4>
+            <div class="field">
+              <label>Maximal Retransmission number</label>
+              <div class="ui input icon">
+                <input placeholder="length value" name="crt" type="text">
+              </div>
+            </div>
+            <div class="field">
+              <label>Pool size</label>
+              <div class="ui input icon">
+                <input placeholder="length value" name="cnrt" type="text">
+              </div>
+            </div>
+            <div class="field">
+              <label>BestEffort</label>
+              <div class="ui input icon">
+                <input placeholder="length value" name="cbe" type="text">
               </div>
             </div>
           </div>
         </div>
-        <div class="ui primary right labeled icon button" (click)="this.toggleTopBar()">
-          Let's roll
-          <i class="bomb icon"></i>
+      </div>
+      <div class="ui three column centered grid">
+        <div class="column">
+          <div class="field">
+            <label>Total number of users</label>
+            <div class="ui input icon">
+              <input [(ngModel)]="params.nbOfUsers" placeholder="Nb of users" name="nbUsers" type="number">
+            </div>
+          </div>
         </div>
+      </div>
+      <div class="ui primary right labeled icon button" (click)="this.toggleTopBar()">
+        Let's roll
+        <i class="bomb icon"></i>
+      </div>
 
-      </form>
-    </div>
+    </form>
+  </div>
 </div>
-    <div class="ui segment charts" style="display: none;">
-      <h4 class="ui header">Pie Chart</h4>
+<div class="ui segment charts" style="display: none;">
+  <h4 class="ui header">Pie Chart</h4>
 
-      <canvas id="myChart" width="400" height="400"></canvas>
-
-
-
-    </div>
+  <canvas id="myChart" width="400" height="400"></canvas>
 
 
-
-
-<div class="ui bottom sidebar static overlay segment">
-<div class="ui container">
-  <table class="ui definition celled table">
-    <thead>
-    <tr>
-      <th></th>
-      <th>Attempts</th>
-      <th>Success</th>
-      <th>Waiting</th>
-      <th>Collisions</th>
-      <th>Canceled</th>
-      <th>Rejected</th>
-
-
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-      <td>RealTime</td>
-
-      <td>1</td>
-      <td>2</td>
-      <td>3</td>
-      <td>4</td>
-      <td>5</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <td>Non-RealTime</td>
-
-      <td>1</td>
-      <td>2</td>
-      <td>3</td>
-      <td>4</td>
-      <td>5</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <td>Best Effort</td>
-
-      <td>1</td>
-      <td>2</td>
-      <td>3</td>
-      <td>4</td>
-      <td>5</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <td>Total</td>
-
-      <td>1</td>
-      <td>2</td>
-      <td>3</td>
-      <td>4</td>
-      <td>5</td>
-      <td>6</td>
-    </tr>
-    </tbody>
-  </table>
 </div>
+
+
+<div class="ui bottom sidebar static overlay segment" style="max-height: 230px !important;">
+  <div class="ui toggle checkbox floating left" style="position: absolute">
+    <input type="checkbox" name="public">
+    <label>Subscribe to weekly newsletter</label>
+  </div>
+  <div class="ui container">
+    <table class="ui definition celled table">
+      <thead>
+      <tr>
+        <th></th>
+        <th>Attempts</th>
+        <th>Success</th>
+        <th>Waiting</th>
+        <th>Collisions</th>
+        <th>Canceled</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>RealTime</td>
+        <td>{{this.stats.user.RT.attempts}}</td>
+        <td>{{this.stats.user.RT.success}}</td>
+        <td>{{this.stats.user.RT.backOffs}}</td>
+        <td>{{this.stats.user.RT.collisions}}</td>
+        <td>{{this.stats.user.RT.canceled}}</td>
+      </tr>
+      <tr>
+        <td>Non-RealTime</td>
+        <td>{{this.stats.user.NRT.attempts}}</td>
+        <td>{{this.stats.user.NRT.success}}</td>
+        <td>{{this.stats.user.NRT.backOffs}}</td>
+        <td>{{this.stats.user.NRT.collisions}}</td>
+        <td>{{this.stats.user.NRT.canceled}}</td>
+      </tr>
+      <tr>
+        <td>Best Effort</td>
+        <td>{{this.stats.user.BE.attempts}}</td>
+        <td>{{this.stats.user.BE.success}}</td>
+        <td>{{this.stats.user.BE.backOffs}}</td>
+        <td>{{this.stats.user.BE.collisions}}</td>
+        <td>{{this.stats.user.BE.canceled}}</td>
+      </tr>
+      <tr>
+        <td>Total</td>
+        <td>{{this.stats.user.RT.attempts+this.stats.user.NRT.attempts+this.stats.user.BE.attempts}}</td>
+        <td>{{this.stats.user.RT.success+this.stats.user.NRT.success+this.stats.user.BE.success}}</td>
+        <td>{{this.stats.user.RT.backOffs+this.stats.user.NRT.backOffs+this.stats.user.BE.backOffs}}</td>
+        <td>{{this.stats.user.RT.collisions+this.stats.user.NRT.collisions+this.stats.user.BE.collisions}}</td>
+        <td>{{this.stats.user.RT.canceled+this.stats.user.NRT.canceled+this.stats.user.BE.canceled}}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
