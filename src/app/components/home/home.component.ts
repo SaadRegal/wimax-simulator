@@ -45,11 +45,22 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.initUI();
     this.RunSimulation();
-
   }
 
 
   RunSimulation() {
+    $("#dimmer").transition({
+      animation:'fade in',
+      // onHide: this.start(),
+    });
+
+    setTimeout(() => {
+      this.start()
+    }, 500);
+
+
+  }
+  start(){
     this.initResult();
     let bs = new BaseStation();
     bs.params = this.params;
@@ -98,6 +109,7 @@ export class HomeComponent implements OnInit {
     // console.log(bs.waitingList);
     // console.log(bs.failedList);
     this.initialStats(bs);
+    $("#dimmer").transition('fade out');
   }
 
   initResult(){
@@ -175,12 +187,20 @@ export class HomeComponent implements OnInit {
 
 
 //UI
+  displayInitStats(){
+    $('.sidebar.bottom').transition('fade in');
+    this.RunSimulation()
+  }
   initUI() {
-    $("input").on("focus",() =>{
+    // $('.ui.checkbox').checkbox();
+    $("input[type='text']").on("focus",() =>{
       // $('.sidebar.bottom').sidebar({"dimPage":"false"}).sidebar('show');
       $('.sidebar.bottom').transition('fade in');
+      let check=$('#rtSimulation').is(":checked");
+      if(check){
+        this.RunSimulation();
+      }
 
-      this.RunSimulation();
     });
 
 

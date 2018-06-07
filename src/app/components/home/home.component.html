@@ -1,3 +1,4 @@
+<div>
 <div class="ui top demo sidebar ui segment  scale down">
   <div class="ui center aligned page grid">
     <div class="one column row">
@@ -111,10 +112,14 @@
           </div>
         </div>
       </div>
-      <div class="ui primary right labeled icon button" (click)="this.toggleTopBar()">
-        Let's roll
-        <i class="bomb icon"></i>
+      <div class="ui primary right labeled icon button" (click)="toggleTopBar()">
+        Show Statistics
+        <i class="chart bar outline icon"></i>
       </div>
+
+      <button class="ui icon button teal" (click)="displayInitStats()">
+        <i class="refresh icon"></i>
+      </button>
 
     </form>
   </div>
@@ -129,10 +134,17 @@
 
 
 <div class="ui bottom sidebar static overlay segment" style="max-height: 230px !important;">
-  <div class="ui toggle checkbox floating left" style="position: absolute">
-    <input type="checkbox" name="public">
-    <label>Subscribe to weekly newsletter</label>
+  <div class="ui active dimmer" id="dimmer">
+    <div class="ui text loader">Calculating</div>
   </div>
+  <div class="ui toggle checkbox positive floating left" style="position: absolute">
+    <input type="checkbox" id="rtSimulation">
+    <label>RealTime Values</label>
+  </div>
+  <!--<div class="ui checked checkbox">-->
+    <!--<input type="checkbox" id="rtSimulation" checked="">-->
+    <!--<label>Active</label>-->
+  <!--</div>-->
   <div class="ui container">
     <table class="ui definition celled table">
       <thead>
@@ -183,3 +195,4 @@
   </div>
 </div>
 
+</div>
