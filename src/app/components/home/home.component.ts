@@ -28,7 +28,7 @@ export class HomeComponent implements OnInit {
       NRT: 3,
       BE: 4
     },
-    stats: {currentCycle: 1}
+    poolSize:200
   };
 
   stats: Stats = {
@@ -45,12 +45,15 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.initUI();
     this.RunSimulation();
+
+
+    this.renderCharts();
   }
 
 
   RunSimulation() {
     $("#dimmer").transition({
-      animation:'fade in',
+      animation: 'fade in',
       // onHide: this.start(),
     });
 
@@ -60,7 +63,8 @@ export class HomeComponent implements OnInit {
 
 
   }
-  start(){
+
+  start() {
     this.initResult();
     let bs = new BaseStation();
     bs.params = this.params;
@@ -109,11 +113,11 @@ export class HomeComponent implements OnInit {
     // console.log(bs.waitingList);
     // console.log(bs.failedList);
     this.initialStats(bs);
-    $("#dimmer").transition('fade out');
+
   }
 
-  initResult(){
-    this.stats={
+  initResult() {
+    this.stats = {
       user: {
         RT: {collisions: 0, attempts: 0, backOffs: 0, success: 0, canceled: 0},
         NRT: {collisions: 0, attempts: 0, backOffs: 0, success: 0, canceled: 0},
@@ -182,67 +186,28 @@ export class HomeComponent implements OnInit {
       }
 
     }
-
+    $("#dimmer").transition('fade out');
   }
 
 
 //UI
-  displayInitStats(){
+  displayInitStats() {
     $('.sidebar.bottom').transition('fade in');
     this.RunSimulation()
   }
+
   initUI() {
     // $('.ui.checkbox').checkbox();
-    $("input[type='text']").on("focus",() =>{
+    $("input[type='text']").on("focus", () => {
       // $('.sidebar.bottom').sidebar({"dimPage":"false"}).sidebar('show');
       $('.sidebar.bottom').transition('fade in');
-      let check=$('#rtSimulation').is(":checked");
-      if(check){
+      let check = $('#rtSimulation').is(":checked");
+      if (check) {
         this.RunSimulation();
       }
-
     });
 
-
-
-
-    var ctx = document.getElementById("myChart");
-    var myChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-        datasets: [{
-          label: '# of Votes',
-          data: [12, 19, 3, 5, 2, 3],
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
-            'rgba(255, 206, 86, 0.2)',
-            'rgba(75, 192, 192, 0.2)',
-            'rgba(153, 102, 255, 0.2)',
-            'rgba(255, 159, 64, 0.2)'
-          ],
-          borderColor: [
-            'rgba(255,99,132,1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(255, 159, 64, 1)'
-          ],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true
-            }
-          }]
-        }
-      }
-    });
+    $('.ui.dropdown').dropdown();
 
 
   }
@@ -267,6 +232,190 @@ export class HomeComponent implements OnInit {
       // "onComplete":$('.charts').transition('fade in')
       // })
     });
+    this.renderCharts()
+  }
+
+  renderCharts() {
+
+    let pie = $('.pieChart');
+
+    let choices = $('#pieStatsChoice');
+    let pieInitData = [58, 8, 9];
+
+
+    let pieChart = new Chart(pie, {
+      type: 'pie',
+      data: {
+        labels: ["RealTime", "Non RealTime", "Best Effort"],
+        datasets: [{
+          label: '# of Votes',
+          data: pieInitData,
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(255, 206, 86, 0.2)',
+          ],
+          borderColor: [
+            'rgba(255,99,132,1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        }
+      }
+    });
+    let choice = "attempts";
+    choices.change(function () {
+      choice = this.value;
+
+      switch (choice) {
+        case ("success"): {
+          pieChart.config.data.datasets[0].data = [15, 9, 3];
+          // pieChart.config.data.datasets[0].data=[this.stats.user.RT.success,this.stats.user.NRT.success,this.stats.user.BE.success];
+          break;
+        }
+        case ("canceled"): {
+          pieChart.config.data.datasets[0].data = [10, 15, 2];
+          // pieChart.config.data.datasets[0].data=[this.stats.user.RT.canceled,this.stats.user.NRT.canceled,this.stats.user.BE.canceled];
+          break;
+        }
+        case ("backOff"): {
+          pieChart.config.data.datasets[0].data = [4, 87, 28];
+          // pieChart.config.data.datasets[0].data=[this.stats.user.RT.backOffs,this.stats.user.NRT.backOffs,this.stats.user.BE.backOffs];
+          break;
+        }
+        case ("attempts"): {
+          pieChart.config.data.datasets[0].data = [9, 58, 78];
+          // pieChart.config.data.datasets[0].data=[this.stats.user.RT.attempts,this.stats.user.NRT.attempts,this.stats.user.BE.attempts];
+          break;
+        }
+        default: {
+          pieChart.config.data.datasets[0].data = [5, 6, 25];
+          // pieChart.config.data.datasets[0].data=[this.stats.user.RT.attempts,this.stats.user.NRT.attempts,this.stats.user.BE.attempts];
+          break;
+        }
+      }
+      pieChart.update();
+
+    });
+
+
+
+
+    let line = $('.lineChart');
+    // let lineChart = new Chart(line, {
+    //   type: 'bar',
+    //   data: {
+    //     labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+    //     datasets: [{
+    //       label: '# of Votes',
+    //       data: [12, 19, 3, 5, 2, 3],
+    //       backgroundColor: [
+    //         'rgba(255, 99, 132, 0.2)',
+    //         'rgba(54, 162, 235, 0.2)',
+    //         'rgba(255, 206, 86, 0.2)',
+    //         'rgba(75, 192, 192, 0.2)',
+    //         'rgba(153, 102, 255, 0.2)',
+    //         'rgba(255, 159, 64, 0.2)'
+    //       ],
+    //       borderColor: [
+    //         'rgba(255,99,132,1)',
+    //         'rgba(54, 162, 235, 1)',
+    //         'rgba(255, 206, 86, 1)',
+    //         'rgba(75, 192, 192, 1)',
+    //         'rgba(153, 102, 255, 1)',
+    //         'rgba(255, 159, 64, 1)'
+    //       ],
+    //       borderWidth: 1
+    //     }]
+    //   },
+    //   options: {
+    //     scales: {
+    //       yAxes: [{
+    //         ticks: {
+    //           beginAtZero: true
+    //         }
+    //       }]
+    //     }
+    //   }
+    // });
+
+
+    let config = {
+      type: 'line',
+      data: {
+        labels: ['1', '2', '3', '4', '5', '6', '7'],
+        datasets: [{
+          label: 'RealTime',
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255,99,132,1)',
+          data: [5,8,9],
+          fill: false,
+        }, {
+          label: 'Non RealTime',
+          fill: false,
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          data: [8,9,4
+          ],
+        }, {
+          label: 'Best Effort',
+          fill: false,
+          backgroundColor: 'rgba(255, 206, 86, 0.2)',
+          borderColor: 'rgba(255, 206, 86, 1)',
+          data: [5,6,4
+          ],
+        }]
+
+      },
+      options: {
+        responsive: true,
+        title: {
+          display: true,
+          text: 'Chart.js Line Chart'
+        },
+        tooltips: {
+          mode: 'index',
+          intersect: false,
+        },
+        hover: {
+          mode: 'nearest',
+          intersect: true
+        },
+        scales: {
+          xAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Cycles'
+            }
+          }],
+          yAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Value'
+            }
+          }]
+        }
+      }
+    };
+
+    let lineChart =new Chart(line,config);
+
+
+
+
+
   }
 
 

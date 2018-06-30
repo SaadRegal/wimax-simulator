@@ -280,10 +280,8 @@ export interface Params {
     RT: number,
     NRT: number,
     BE: number
-  }
-  stats:{
-    currentCycle:number
-  }
+  },poolSize:number
+
 }
 
 interface Props {

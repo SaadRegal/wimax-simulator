@@ -25,7 +25,7 @@
 
 <!--<a (click)="this.toggleTopBar()">submit</a>-->
 
-<div class="ui container" style="margin-top: 5px">
+<div class="ui container" style="margin-top: 5px; display: block">
   <div class="ui segment">
     <div class="ui blue center aligned segment">
       <h2 class="ui header">WiMax 802.16 Simulator</h2>
@@ -82,15 +82,15 @@
           <div class="column">
             <h4 class="ui dividing header centered violet">Simulation parameters</h4>
             <div class="field">
-              <label>Maximal Retransmission number</label>
+              <label>Number of cycles</label>
               <div class="ui input icon">
-                <input placeholder="length value" name="crt" type="text">
+                <input [(ngModel)]="params.nbOfCycles" placeholder="length value" name="crt" type="text">
               </div>
             </div>
             <div class="field">
               <label>Pool size</label>
               <div class="ui input icon">
-                <input placeholder="length value" name="cnrt" type="text">
+                <input [(ngModel)]="params.poolSize" placeholder="length value" name="cnrt" type="text">
               </div>
             </div>
             <div class="field">
@@ -122,24 +122,48 @@
       </button>
 
     </form>
+
+
   </div>
 </div>
-<div class="ui segment charts" style="display: none;">
-  <h4 class="ui header">Pie Chart</h4>
 
-  <canvas id="myChart" width="400" height="400"></canvas>
+  <div class="ui segment charts" style="display: block">
+
+    <select class="ui dropdown" id="pieStatsChoice">
+      <option value="attempts">Attempts</option>
+      <option value="success">Success</option>
+      <option value="canceled">Canceled</option>
+      <option value="backOff">BackOff</option>
+    </select>
+
+    <h4 class="ui header">Pie Chart</h4>
+
+    <div style="width: 40%">
+      <canvas class="pieChart"></canvas>
+    </div>
 
 
-</div>
+
+    <h4 class="ui header">Line Chart</h4>
+
+    <div style="width: 40%">
+      <canvas class="lineChart"></canvas>
+    </div>
 
 
-<div class="ui bottom sidebar static overlay segment" style="max-height: 230px !important;">
+
+
+  </div>
+
+
+
+<div class="ui bottom sidebar static overlay segment" style="max-height: 230px !important; overflow:hidden !important;">
   <div class="ui active dimmer" id="dimmer">
     <div class="ui text loader">Calculating</div>
   </div>
   <div class="ui toggle checkbox positive floating left" style="position: absolute">
     <input type="checkbox" id="rtSimulation">
-    <label>RealTime Values</label>
+    <label>Instant Values</label>
   </div>
   <!--<div class="ui checked checkbox">-->
     <!--<input type="checkbox" id="rtSimulation" checked="">-->
