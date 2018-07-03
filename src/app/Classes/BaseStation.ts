@@ -1,29 +1,29 @@
 import {Utils} from "./Utils";
 
-// import {User} from './User';
 export class BaseStation {
   usersList: Array<User> = [];
   waitingList: Array<User> = [];
   failedList: Array<User> = [];
+  ongoingUsers: Array<User> = [];
+  successUsers: Array<User> = [];
   attempts: number;
-  CDMALength: number;
-  delay: number;
-  cycles: number = 0;
   backOff: number;
-  list: Array<number>;
   params: Params;
-  // history:Array<{
-  //   cycle:Array<User>
-  // }>;
-
-  history:Array<{
+  history: Array<{
     cycle: number,
     waiting: Array<User>,
     failed: Array<User>,
     success: Array<User>,
     collision: Array<User>,
-  }>=[];
+  }> = [];
   collisionHistory: Array<User> = [];
+
+  flatHistory:{
+    collision:Array<User>,
+    success:Array<User>,
+    waiting:Array<User>,
+    failed:Array<User>,
+  }
 
 
   constructor() {
@@ -58,7 +58,6 @@ export class BaseStation {
 
   genUsers() {
 
-
     for (let i = 0; i < this.params.nbOfUsers; i++) {
 
       let code = Utils.random(
@@ -82,7 +81,6 @@ export class BaseStation {
         id: i,
         code: code,
         backOff: 0,
-        isInCollision: false,
         type: props.type,
         nbRTrans: 0
       };
@@ -99,7 +97,7 @@ export class BaseStation {
 
   initHistory() {
     for (let i = 0; i < this.params.nbOfCycles; i++) {
-      this.history.push({cycle:i,success:[],waiting:[],failed:[],collision:[]});
+      this.history.push({cycle: i, success: [], waiting: [], failed: [], collision: []});
     }
   }
 
@@ -231,62 +229,91 @@ export class BaseStation {
     // }
 
 
-    let position = 0;
     for (let c = 0; c < this.params.nbOfCycles; c++) {
 
-      let n = Utils.random(0, this.usersList.length);
-      let start = position;
-      while (position <= this.usersList.length) {
-        position = position + n;
-      }
-
-      for (let user of this.waitingList) {
-        if (this.isTimeout(user)) {
-          this.failedList.push(user);
-          Utils.rmv(user, this.waitingList);
-        } else {
-          if (user.backOff > 0 && user) {
-            user.backOff--;
-          } else if (user.backOff == 0) {
-            user.nbRTrans++;
-            this.usersList.push(user);
-            Utils.rmv(user, this.usersList);
-          }
-        }
-      }
 
 
+      // let start = position;
+      // while (position <= this.usersList.length) {
+      //   position = position + n;
+      // }
       // let item = this.history.filter(item=>item.cycle==c);
 
 
       this.recordHistory(c);
 
 
+//========== Processing Waiting list ==========
+      for (let user of this.waitingList) {
+        if (this.isTimeout(user)) {
+          //If user is timedOut then it will be moved from waiting to failed
+          this.failedList.push(user);
+          this.waitingList = Utils.rmv(user, this.waitingList);
 
-      for (let userOne of this.usersList.slice(start, position)) {
-        for (let userTwo of this.usersList.slice(start, position)) {
-          // let item = this.history.filter(item=>item.cycle==c);
+        } else {
+          if (user.backOff > 0) {
+            user.backOff--;
+          } else if (user.backOff == 0) {
+            //this mean the  user will attempt to communicate
+            //so retransmission number will increase
+            user.nbRTrans++;
+            // Then it will be moved from waiting to ongoing users
+            this.ongoingUsers.push(user);
+            this.waitingList = Utils.rmv(user, this.waitingList);
+          }
+        }
+      }
 
+//========== Processing Successful list (!!not finished yet don't put it in report!!)==========
+      //!!the Resource management not implemented yet so user will go straight to ongoing!!
+      for (let user of this.successUsers) {
+        if (1 == 1) {
+          //If user didn't finished yet communication will be moved to ongoing users
+          this.ongoingUsers.push(user);
+          this.successUsers = Utils.rmv(user, this.successUsers);
+        } else {
+          //Since the user done communicating will be removed definitively
+          this.successUsers = Utils.rmv(user, this.successUsers)
+        }
+
+      }
+
+
+
+      // A new random number of the user list will as well want to communicate
+      let n = Utils.random(0, Math.floor(this.usersList.length / 3));
+      //So were moving them to ongoing
+      this.ongoingUsers = this.usersList.slice(0, n);
+      this.usersList = this.usersList.slice(n, this.usersList.length);
+
+      // Now time to check for collisions
+      for (let userOne of this.ongoingUsers) {
+        for (let userTwo of this.ongoingUsers) {
           if (userOne.code == userTwo.code && userOne.id != userTwo.id) {
+            //This means we have 2 different users have the same C.D.M.A code
 
+
+            //this for statistics purposes
             this.collisionHistory.push(userOne);
-
-
-            let item = this.history.filter(item=>item.cycle==c);
+            let item = this.history.filter(item => item.cycle == c);
             item[0].collision.push(userOne);
 
 
-                // this.history.push({cycle:c});
+            //this mean the user has no longer a unique C.D.M.A code
+            // so it will be removed from successful list
+            this.successUsers = Utils.rmv(userOne, this.successUsers);
 
-
+            //Now this user will take a random backOff and gets a new C.D.M.A code and moved to waiting
             userOne.backOff = Utils.random(3, 7);
             userOne.code = this.remakeCDMACode(userOne);
             this.waitingList.push(userOne);
+            this.ongoingUsers = Utils.rmv(userOne, this.ongoingUsers);
 
-            Utils.rmv(userOne, this.usersList);
+
           } else if (userOne.id != userTwo.id) {
-            // userOne.nbRTrans += Utils.random(0.1, 0.3);
-            // userOne.nbRTrans = Math.floor(userOne.nbRTrans);
+            //Until now the user have a unique C.D.M.A code, so it will be copied to successful list
+            this.usersList.push(userOne);
+
           }
         }
       }
@@ -297,13 +324,13 @@ export class BaseStation {
   }
 
   recordHistory(c) {
-    let item = this.history.filter(item=>item.cycle==c);
-    item[0].waiting=item[0].waiting.concat(this.waitingList);
-    item[0].failed=item[0].failed.concat(this.failedList);
+    let item = this.history.filter(item => item.cycle == c);
+    item[0].waiting = item[0].waiting.concat(this.waitingList);
+    item[0].failed = item[0].failed.concat(this.failedList);
     console.log(item)
   }
 
-  renderHistoryData(){
+  renderHistoryData() {
 
   }
 
@@ -317,10 +344,6 @@ export class BaseStation {
     } else {
       return false
     }
-
-  }
-
-  collisionCount() {
 
   }
 
@@ -348,16 +371,6 @@ interface Props {
   type: String
 
 }
-
-// interface History {
-//   cycle: number,
-//   user: {
-//     RT: Events,
-//     NRT: Events,
-//     BE: Events
-//   }
-//
-// }
 
 
 interface History {

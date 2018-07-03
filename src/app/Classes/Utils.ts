@@ -4,9 +4,16 @@ export class Utils {
   }
 
   static rmv(doc,array){
-    array.forEach( (item, index) => {
-      if(item === doc) array.splice(index,1);
+
+
+
+    return array.filter(function(node) {
+      if (node.id == doc.id) {
+        return false;
+      }
+      return true;
     });
+
   }
   static countByType(userList:Array<User>,query:String){
     let count={
@@ -36,6 +43,4 @@ return count;
   }
 
 }
-interface count {
 
-}

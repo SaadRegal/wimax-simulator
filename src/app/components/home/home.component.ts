@@ -48,17 +48,21 @@ list=new Array([]);
   }
 
   ngOnInit() {
-    this.initUI();
-    this.RunSimulation();
-    this.renderCharts();
+    // this.initUI();
+    // this.RunSimulation();
+    // this.renderCharts();
     // this.test();
   }
 
-  test(){
-    for(let i=0 ; i<this.list.length;i++){
-      this.list[i].push({da:1});
-    }
-    // console.log(this.list)
+  test() {
+    let users = [{name: "n1", id: 5}, {name: "n2", id: 6}, {name: "n2", id: 7,}, {name: "n2", id: 8}];
+    // let user = {name: "n1", id: 5};
+
+    users=users.slice(1,2);
+
+    console.log(users);
+
+    // users = Utils.rmv(user, users);
 
   }
 
