@@ -12,7 +12,17 @@ export class BaseStation {
   backOff: number;
   list: Array<number>;
   params: Params;
-  history: History;
+  // history:Array<{
+  //   cycle:Array<User>
+  // }>;
+
+  history:Array<{
+    cycle: number,
+    waiting: Array<User>,
+    failed: Array<User>,
+    success: Array<User>,
+    collision: Array<User>,
+  }>=[];
   collisionHistory: Array<User> = [];
 
 
@@ -37,10 +47,10 @@ export class BaseStation {
       return Utils.random(1, this.params.CDMALimits.RT)
     }
     if (user.type == "NRT") {
-      return Utils.random(this.params.CDMALimits.RT, this.params.CDMALimits.NRT)
+      return Utils.random(this.params.CDMALimits.RT + 1, this.params.CDMALimits.NRT)
     }
     if (user.type == "BE") {
-      return Utils.random(this.params.CDMALimits.NRT, this.params.CDMALimits.BE)
+      return Utils.random(this.params.CDMALimits.NRT + 1, this.params.CDMALimits.BE)
     }
 
 
@@ -48,9 +58,16 @@ export class BaseStation {
 
   genUsers() {
 
+
     for (let i = 0; i < this.params.nbOfUsers; i++) {
 
-      let code = Utils.random(1, this.params.CDMALimits.BE);
+      let code = Utils.random(
+        1,
+        Math.max(this.params.CDMALimits.BE,
+          this.params.CDMALimits.NRT,
+          this.params.CDMALimits.RT)
+      );
+
       let props: Props = {maxNbTrans: 0, type: null};
 
       if (code >= 1 && code < this.params.CDMALimits.RT) {
@@ -66,7 +83,6 @@ export class BaseStation {
         code: code,
         backOff: 0,
         isInCollision: false,
-        isSuccess: 'notYet',
         type: props.type,
         nbRTrans: 0
       };
@@ -76,9 +92,16 @@ export class BaseStation {
 
   connectUsers() {
     this.genUsers();
+    this.initHistory();
     this.checkCollision();
+
   }
 
+  initHistory() {
+    for (let i = 0; i < this.params.nbOfCycles; i++) {
+      this.history.push({cycle:i,success:[],waiting:[],failed:[],collision:[]});
+    }
+  }
 
   checkCollision() {
     // let n = Utils.random(1, this.params.CDMALimits.BE);
@@ -206,14 +229,16 @@ export class BaseStation {
     // }
 
     // }
+
+
     let position = 0;
     for (let c = 0; c < this.params.nbOfCycles; c++) {
+
       let n = Utils.random(0, this.usersList.length);
       let start = position;
       while (position <= this.usersList.length) {
         position = position + n;
       }
-      // console.log('n',n,'start',start,'position',position);
 
       for (let user of this.waitingList) {
         if (this.isTimeout(user)) {
@@ -223,20 +248,45 @@ export class BaseStation {
           if (user.backOff > 0 && user) {
             user.backOff--;
           } else if (user.backOff == 0) {
+            user.nbRTrans++;
             this.usersList.push(user);
             Utils.rmv(user, this.usersList);
           }
         }
       }
+
+
+      // let item = this.history.filter(item=>item.cycle==c);
+
+
+      this.recordHistory(c);
+
+
+
       for (let userOne of this.usersList.slice(start, position)) {
         for (let userTwo of this.usersList.slice(start, position)) {
+          // let item = this.history.filter(item=>item.cycle==c);
+
           if (userOne.code == userTwo.code && userOne.id != userTwo.id) {
-            userOne.nbRTrans++;
+
             this.collisionHistory.push(userOne);
+
+
+            let item = this.history.filter(item=>item.cycle==c);
+            item[0].collision.push(userOne);
+
+
+                // this.history.push({cycle:c});
+
+
             userOne.backOff = Utils.random(3, 7);
             userOne.code = this.remakeCDMACode(userOne);
             this.waitingList.push(userOne);
+
             Utils.rmv(userOne, this.usersList);
+          } else if (userOne.id != userTwo.id) {
+            // userOne.nbRTrans += Utils.random(0.1, 0.3);
+            // userOne.nbRTrans = Math.floor(userOne.nbRTrans);
           }
         }
       }
@@ -245,7 +295,15 @@ export class BaseStation {
     }
 
   }
-  recordHistory(){
+
+  recordHistory(c) {
+    let item = this.history.filter(item=>item.cycle==c);
+    item[0].waiting=item[0].waiting.concat(this.waitingList);
+    item[0].failed=item[0].failed.concat(this.failedList);
+    console.log(item)
+  }
+
+  renderHistoryData(){
 
   }
 
@@ -262,7 +320,7 @@ export class BaseStation {
 
   }
 
-  collisionCount(){
+  collisionCount() {
 
   }
 
@@ -280,7 +338,8 @@ export interface Params {
     RT: number,
     NRT: number,
     BE: number
-  },poolSize:number
+  },
+  poolSize: number
 
 }
 
@@ -290,22 +349,32 @@ interface Props {
 
 }
 
+// interface History {
+//   cycle: number,
+//   user: {
+//     RT: Events,
+//     NRT: Events,
+//     BE: Events
+//   }
+//
+// }
+
+
 interface History {
+
   cycle: number,
-  user: {
-    RT: Events,
-    NRT: Events,
-    BE: Events
-  }
+  waiting: Array<User>,
+  failed: Array<User>,
+  success: Array<User>,
 
 }
 
 export interface Events {
-  collisions:number,
-  backOffs:number,
-  attempts:number,
-  success:number,
-  canceled:number,
+  collisions: number,
+  backOffs: number,
+  attempts: number,
+  success: number,
+  canceled: number,
 }
 
 export interface Stats {

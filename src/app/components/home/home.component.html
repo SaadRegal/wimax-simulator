@@ -84,34 +84,27 @@
             <div class="field">
               <label>Number of cycles</label>
               <div class="ui input icon">
-                <input [(ngModel)]="params.nbOfCycles" placeholder="length value" name="crt" type="text">
+                <input [(ngModel)]="params.nbOfCycles" placeholder="length value" name="nbOfCycles" type="text">
               </div>
             </div>
             <div class="field">
               <label>Pool size</label>
               <div class="ui input icon">
-                <input [(ngModel)]="params.poolSize" placeholder="length value" name="cnrt" type="text">
+                <input [(ngModel)]="params.poolSize" placeholder="length value" name="poolSize" type="text">
               </div>
             </div>
             <div class="field">
-              <label>BestEffort</label>
+              <label>Number of users</label>
               <div class="ui input icon">
-                <input placeholder="length value" name="cbe" type="text">
+                <input [(ngModel)]="params.nbOfUsers" placeholder="Nb of users" name="nbUsers" type="number">
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="ui three column centered grid">
-        <div class="column">
-          <div class="field">
-            <label>Total number of users</label>
-            <div class="ui input icon">
-              <input [(ngModel)]="params.nbOfUsers" placeholder="Nb of users" name="nbUsers" type="number">
-            </div>
-          </div>
-        </div>
-      </div>
+
+
+      <div style="margin-bottom: 20px"></div>
       <div class="ui primary right labeled icon button" (click)="toggleTopBar()">
         Show Statistics
         <i class="chart bar outline icon"></i>

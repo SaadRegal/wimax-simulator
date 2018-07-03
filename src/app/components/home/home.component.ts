@@ -20,7 +20,7 @@ declare let Chart: any;
 export class HomeComponent implements OnInit {
   params: Params = {
     nbOfUsers: 200,
-    nbOfCycles: 900,
+    nbOfCycles: 3,
     CDMALimits: {
       RT: 75,
       NRT: 175,
@@ -31,7 +31,7 @@ export class HomeComponent implements OnInit {
       NRT: 3,
       BE: 4
     },
-    poolSize:200
+    poolSize:180
   };
 
   stats: Stats = {
@@ -42,15 +42,24 @@ export class HomeComponent implements OnInit {
     }
   };
 
+
+list=new Array([]);
   constructor() {
   }
 
   ngOnInit() {
     this.initUI();
     this.RunSimulation();
-
-
     this.renderCharts();
+    // this.test();
+  }
+
+  test(){
+    for(let i=0 ; i<this.list.length;i++){
+      this.list[i].push({da:1});
+    }
+    // console.log(this.list)
+
   }
 
 
@@ -72,33 +81,20 @@ export class HomeComponent implements OnInit {
     let bs = new BaseStation();
     bs.params = this.params;
     bs.connectUsers();
-    for (let user of bs.usersList) {
+// console.log(bs.history);
+    // console.log('userlist',bs.usersList)
+    // console.log('failed',bs.failedList)
+    // console.log('waiting',bs.waitingList)
+    for (let user of bs.waitingList) {
       // console.log(user.isSuccess)
 
-      if (user.isSuccess == 'false') {
-        console.log(user.isSuccess)
+      if (user.type == 'be') {
+        console.log("be")
       }
       // if (!user.isSuccess){console.log('succe')}
       // if (!user.isInCollision){console.log('boy')}
     }
 
-    for (let user of bs.usersList) {
-      // if(user.isSuccess=='true'){console.log(user.isSuccess)}
-      // if (!user.isSuccess){console.log('yeah')}
-      // if (!user.isInCollision){console.log('coll')}
-    }
-
-    for (let user of bs.usersList) {
-      // if(user.isSuccess=='notYet'){console.log(user.isSuccess)}
-      // if (!user.isSuccess){console.log('yeah')}
-      // if (!user.isInCollision){console.log('coll')}
-    }
-
-    for (let user of bs.usersList) {
-      // if(user.isInCollision){console.log('collisions',user.isInCollision)}
-      // if (!user.isSuccess){console.log('yeah')}
-      // if (!user.isInCollision){console.log('coll')}
-    }
 
     // console.info('validating ...');
     // let c = 0;
@@ -115,6 +111,7 @@ export class HomeComponent implements OnInit {
     // console.log(bs.usersList);
     // console.log(bs.waitingList);
     // console.log(bs.failedList);
+
     this.initialStats(bs);
 
   }
@@ -131,7 +128,7 @@ export class HomeComponent implements OnInit {
 
   initialStats(bs: BaseStation) {
     let globalList: Array<User> = [];
-    globalList = globalList.concat(bs.failedList, bs.usersList, bs.usersList);
+    globalList = globalList.concat(bs.failedList, bs.usersList);
     // for(let user of bs.usersList){
     //   globalList.push(user);
     // }
@@ -155,12 +152,15 @@ export class HomeComponent implements OnInit {
 //       }
 //     }
 
+
+
     let count = Utils.countByType(bs.failedList, "type");
     this.stats.user.RT.canceled = count.RT;
     this.stats.user.NRT.canceled = count.NRT;
     this.stats.user.BE.canceled = count.BE;
 
     count = Utils.countByType(bs.collisionHistory, "type");
+    console.log(bs.collisionHistory.length);
     this.stats.user.RT.collisions = count.RT;
     this.stats.user.NRT.collisions = count.NRT;
     this.stats.user.BE.collisions = count.BE;
@@ -173,15 +173,16 @@ export class HomeComponent implements OnInit {
     // backOff and attempts count
     for (let user of globalList) {
 
+
       if (user.type == 'RT') {
         this.stats.user.RT.attempts += user.nbRTrans;
         this.stats.user.RT.backOffs += user.backOff;
-      }
+      }else
 
       if (user.type == 'NRT') {
         this.stats.user.NRT.attempts += user.nbRTrans;
         this.stats.user.NRT.backOffs += user.backOff;
-      }
+      }else
 
       if (user.type == 'BE') {
         this.stats.user.BE.attempts += user.nbRTrans;

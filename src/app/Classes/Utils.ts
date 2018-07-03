@@ -17,6 +17,7 @@ export class Utils {
 switch (query){
   case "type":{
     for(let user of userList){
+
       if(user.type=="RT"){
           count.RT++;
       }
