@@ -19,8 +19,8 @@ declare let Chart: any;
 
 export class HomeComponent implements OnInit {
   params: Params = {
-    nbOfUsers: 200,
-    nbOfCycles: 3,
+    nbOfUsers: 201,
+    nbOfCycles: 500,
     CDMALimits: {
       RT: 75,
       NRT: 175,
@@ -36,9 +36,9 @@ export class HomeComponent implements OnInit {
 
   stats: Stats = {
     user: {
-      RT: {collisions: 0, attempts: 0, backOffs: 0, success: 0, canceled: 0},
-      NRT: {collisions: 0, attempts: 0, backOffs: 0, success: 0, canceled: 0},
-      BE: {collisions: 0, attempts: 0, backOffs: 0, success: 0, canceled: 0}
+      RT: {collisions: 0, reTransmission: 0, backOffs: 0, success: 0, canceled: 0},
+      NRT: {collisions: 0, reTransmission: 0, backOffs: 0, success: 0, canceled: 0},
+      BE: {collisions: 0, reTransmission: 0, backOffs: 0, success: 0, canceled: 0}
     }
   };
 
@@ -48,23 +48,23 @@ list=new Array([]);
   }
 
   ngOnInit() {
-    // this.initUI();
-    // this.RunSimulation();
-    // this.renderCharts();
+    this.initUI();
+    this.RunSimulation();
+    this.renderCharts(this.stats);
     // this.test();
   }
 
-  test() {
-    let users = [{name: "n1", id: 5}, {name: "n2", id: 6}, {name: "n2", id: 7,}, {name: "n2", id: 8}];
-    // let user = {name: "n1", id: 5};
-
-    users=users.slice(1,2);
-
-    console.log(users);
-
-    // users = Utils.rmv(user, users);
-
-  }
+  // test() {
+  //   let users = [{name: "n1", id: 5}, {name: "n2", id: 6}, {name: "n2", id: 7,}, {name: "n2", id: 8}];
+  //   // let user = {name: "n1", id: 5};
+  //
+  //   users=users.slice(1,2);
+  //
+  //   console.log(users);
+  //
+  //   // users = Utils.rmv(user, users);
+  //
+  // }
 
 
   RunSimulation() {
@@ -75,7 +75,7 @@ list=new Array([]);
 
     setTimeout(() => {
       this.start()
-    }, 500);
+    },50);
 
 
   }
@@ -85,115 +85,79 @@ list=new Array([]);
     let bs = new BaseStation();
     bs.params = this.params;
     bs.connectUsers();
-// console.log(bs.history);
-    // console.log('userlist',bs.usersList)
-    // console.log('failed',bs.failedList)
-    // console.log('waiting',bs.waitingList)
-    for (let user of bs.waitingList) {
-      // console.log(user.isSuccess)
-
-      if (user.type == 'be') {
-        console.log("be")
-      }
-      // if (!user.isSuccess){console.log('succe')}
-      // if (!user.isInCollision){console.log('boy')}
-    }
-
-
-    // console.info('validating ...');
-    // let c = 0;
-    // for (let userOne of bs.usersList) {
-    //   for (let userTwo of bs.usersList) {
-    //     if (userOne.code == userTwo.code && userOne.id != userTwo.id) {
-    //       // console.log(userOne.code,userOne,userTwo.code,userTwo)
-    //       c++;
-    //     }
-    //   }
-    // }
-    // console.warn(c, 'collision');
-
-    // console.log(bs.usersList);
-    // console.log(bs.waitingList);
-    // console.log(bs.failedList);
-
     this.initialStats(bs);
-
   }
 
   initResult() {
     this.stats = {
       user: {
-        RT: {collisions: 0, attempts: 0, backOffs: 0, success: 0, canceled: 0},
-        NRT: {collisions: 0, attempts: 0, backOffs: 0, success: 0, canceled: 0},
-        BE: {collisions: 0, attempts: 0, backOffs: 0, success: 0, canceled: 0}
+        RT: {collisions: 0, reTransmission: 0, backOffs: 0, success: 0, canceled: 0},
+        NRT: {collisions: 0, reTransmission: 0, backOffs: 0, success: 0, canceled: 0},
+        BE: {collisions: 0, reTransmission: 0, backOffs: 0, success: 0, canceled: 0}
       }
     }
   }
 
   initialStats(bs: BaseStation) {
-    let globalList: Array<User> = [];
-    globalList = globalList.concat(bs.failedList, bs.usersList);
-    // for(let user of bs.usersList){
-    //   globalList.push(user);
-    // }
-    // for(let user of bs.waitingList){
-    //   globalList.push(user);
-    // }
-    // for(let user of bs.failedList){
-    //   globalList.push(user);
-    // }
-    // console.log(globalList);
-// Success count
-//     for (let user of bs.usersList) {
-//       if (user.type == 'RT') {
-//         this.stats.user.RT.success++
-//       }
-//       if (user.type == 'NRT') {
-//         this.stats.user.RT.success++
-//       }
-//       if (user.type == 'BE') {
-//         this.stats.user.RT.success++
-//       }
-//     }
 
+    // =====Statistics visualization=====
 
-
-    let count = Utils.countByType(bs.failedList, "type");
+    //Failed
+    let count = Utils.countBy(bs.flatHistory.failed, "type");
     this.stats.user.RT.canceled = count.RT;
     this.stats.user.NRT.canceled = count.NRT;
     this.stats.user.BE.canceled = count.BE;
 
-    count = Utils.countByType(bs.collisionHistory, "type");
-    console.log(bs.collisionHistory.length);
+    //Collisions
+    count = Utils.countBy(bs.flatHistory.collision, "type");
     this.stats.user.RT.collisions = count.RT;
     this.stats.user.NRT.collisions = count.NRT;
     this.stats.user.BE.collisions = count.BE;
 
-    count = Utils.countByType(bs.usersList, "type");
+    //Success
+    count = Utils.countBy(bs.flatHistory.success, "type");
     this.stats.user.RT.success = count.RT;
     this.stats.user.NRT.success = count.NRT;
     this.stats.user.BE.success = count.BE;
 
-    // backOff and attempts count
-    for (let user of globalList) {
 
 
+
+    // BackOff count
+    for (let user of bs.flatHistory.backOff) {
       if (user.type == 'RT') {
-        this.stats.user.RT.attempts += user.nbRTrans;
         this.stats.user.RT.backOffs += user.backOff;
       }else
 
       if (user.type == 'NRT') {
-        this.stats.user.NRT.attempts += user.nbRTrans;
         this.stats.user.NRT.backOffs += user.backOff;
       }else
 
       if (user.type == 'BE') {
-        this.stats.user.BE.attempts += user.nbRTrans;
         this.stats.user.BE.backOffs += user.backOff;
       }
 
     }
+
+    // Retransmission count
+
+    for (let user of bs.flatHistory.retransmission) {
+      if (user.type == 'RT') {
+        this.stats.user.RT.reTransmission += user.nbRTrans;
+      }else
+
+      if (user.type == 'NRT') {
+        this.stats.user.NRT.reTransmission += user.nbRTrans;
+      }else
+
+      if (user.type == 'BE') {
+        this.stats.user.BE.reTransmission += user.nbRTrans;
+      }
+
+    }
+
+
+
     $("#dimmer").transition('fade out');
   }
 
@@ -240,15 +204,15 @@ list=new Array([]);
       // "onComplete":$('.charts').transition('fade in')
       // })
     });
-    this.renderCharts()
+    this.renderCharts(this.stats)
   }
 
-  renderCharts() {
+  renderCharts(stats) {
 
     let pie = $('.pieChart');
 
     let choices = $('#pieStatsChoice');
-    let pieInitData = [58, 8, 9];
+    let pieInitData = [0, 0, 0];
 
 
     let pieChart = new Chart(pie, {
@@ -281,34 +245,29 @@ list=new Array([]);
         }
       }
     });
-    let choice = "attempts";
+    let choice = "reTransmission";
     choices.change(function () {
       choice = this.value;
 
       switch (choice) {
         case ("success"): {
-          pieChart.config.data.datasets[0].data = [15, 9, 3];
-          // pieChart.config.data.datasets[0].data=[this.stats.user.RT.success,this.stats.user.NRT.success,this.stats.user.BE.success];
+          pieChart.config.data.datasets[0].data=[stats.user.RT.success,stats.user.NRT.success,stats.user.BE.success];
           break;
         }
         case ("canceled"): {
-          pieChart.config.data.datasets[0].data = [10, 15, 2];
-          // pieChart.config.data.datasets[0].data=[this.stats.user.RT.canceled,this.stats.user.NRT.canceled,this.stats.user.BE.canceled];
+          pieChart.config.data.datasets[0].data=[stats.user.RT.canceled,stats.user.NRT.canceled,stats.user.BE.canceled];
           break;
         }
         case ("backOff"): {
-          pieChart.config.data.datasets[0].data = [4, 87, 28];
-          // pieChart.config.data.datasets[0].data=[this.stats.user.RT.backOffs,this.stats.user.NRT.backOffs,this.stats.user.BE.backOffs];
+          pieChart.config.data.datasets[0].data=[stats.user.RT.backOffs,stats.user.NRT.backOffs,stats.user.BE.backOffs];
           break;
         }
-        case ("attempts"): {
-          pieChart.config.data.datasets[0].data = [9, 58, 78];
-          // pieChart.config.data.datasets[0].data=[this.stats.user.RT.attempts,this.stats.user.NRT.attempts,this.stats.user.BE.attempts];
+        case ("reTransmission"): {
+          pieChart.config.data.datasets[0].data=[stats.user.RT.reTransmission,stats.user.NRT.reTransmission,stats.user.BE.reTransmission];
           break;
         }
         default: {
-          pieChart.config.data.datasets[0].data = [5, 6, 25];
-          // pieChart.config.data.datasets[0].data=[this.stats.user.RT.attempts,this.stats.user.NRT.attempts,this.stats.user.BE.attempts];
+          pieChart.config.data.datasets[0].data=[stats.user.RT.reTransmission,stats.user.NRT.reTransmission,stats.user.BE.reTransmission];
           break;
         }
       }

@@ -4,6 +4,8 @@ class User {
   backOff: number = 0;
   type:String;
   nbRTrans:number;
+  isSuccess:boolean;
+  fileSize:number;
   constructor() {
   }
 

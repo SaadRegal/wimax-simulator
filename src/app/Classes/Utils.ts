@@ -1,4 +1,7 @@
 export class Utils {
+
+  static isOdd(num) { return num % 2;}
+
   static random(min:number, max:number){
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
@@ -15,7 +18,7 @@ export class Utils {
     });
 
   }
-  static countByType(userList:Array<User>,query:String){
+  static countBy(userList:Array<User>, query:String){
     let count={
       RT:0,
       NRT:0,

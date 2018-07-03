@@ -109,6 +109,10 @@
         Show Statistics
         <i class="chart bar outline icon"></i>
       </div>
+      <div class="ui primary right labeled icon button" (click)="renderCharts(stats)">
+        Show RENDER
+        <i class="chart bar outline icon"></i>
+      </div>
 
       <button class="ui icon button teal" (click)="displayInitStats()">
         <i class="refresh icon"></i>
@@ -123,10 +127,10 @@
   <div class="ui segment charts" style="display: block">
 
     <select class="ui dropdown" id="pieStatsChoice">
-      <option value="attempts">Attempts</option>
-      <option value="success">Success</option>
+      <option value="reTransmission">Re-transmissions</option>
+      <option value="success">Success Communications</option>
       <option value="canceled">Canceled</option>
-      <option value="backOff">BackOff</option>
+      <option value="backOff">BackOffs</option>
     </select>
 
     <h4 class="ui header">Pie Chart</h4>
@@ -167,9 +171,9 @@
       <thead>
       <tr>
         <th></th>
-        <th>Attempts</th>
-        <th>Success</th>
-        <th>Waiting</th>
+        <th>Re-Transmissions</th>
+        <th>Successful Communications on {{params.nbOfCycles}} cycles</th>
+        <th>BackOffs</th>
         <th>Collisions</th>
         <th>Canceled</th>
       </tr>
@@ -177,7 +181,7 @@
       <tbody>
       <tr>
         <td>RealTime</td>
-        <td>{{this.stats.user.RT.attempts}}</td>
+        <td>{{this.stats.user.RT.reTransmission}}</td>
         <td>{{this.stats.user.RT.success}}</td>
         <td>{{this.stats.user.RT.backOffs}}</td>
         <td>{{this.stats.user.RT.collisions}}</td>
@@ -185,7 +189,7 @@
       </tr>
       <tr>
         <td>Non-RealTime</td>
-        <td>{{this.stats.user.NRT.attempts}}</td>
+        <td>{{this.stats.user.NRT.reTransmission}}</td>
         <td>{{this.stats.user.NRT.success}}</td>
         <td>{{this.stats.user.NRT.backOffs}}</td>
         <td>{{this.stats.user.NRT.collisions}}</td>
@@ -193,15 +197,15 @@
       </tr>
       <tr>
         <td>Best Effort</td>
-        <td>{{this.stats.user.BE.attempts}}</td>
+        <td>{{this.stats.user.BE.reTransmission}}</td>
         <td>{{this.stats.user.BE.success}}</td>
         <td>{{this.stats.user.BE.backOffs}}</td>
         <td>{{this.stats.user.BE.collisions}}</td>
         <td>{{this.stats.user.BE.canceled}}</td>
       </tr>
-      <tr>
+      <tr class="positive">
         <td>Total</td>
-        <td>{{this.stats.user.RT.attempts+this.stats.user.NRT.attempts+this.stats.user.BE.attempts}}</td>
+        <td>{{this.stats.user.RT.reTransmission+this.stats.user.NRT.reTransmission+this.stats.user.BE.reTransmission}}</td>
         <td>{{this.stats.user.RT.success+this.stats.user.NRT.success+this.stats.user.BE.success}}</td>
         <td>{{this.stats.user.RT.backOffs+this.stats.user.NRT.backOffs+this.stats.user.BE.backOffs}}</td>
         <td>{{this.stats.user.RT.collisions+this.stats.user.NRT.collisions+this.stats.user.BE.collisions}}</td>

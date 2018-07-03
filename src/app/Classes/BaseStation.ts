@@ -9,6 +9,7 @@ export class BaseStation {
   attempts: number;
   backOff: number;
   params: Params;
+  resources: number;
   history: Array<{
     cycle: number,
     waiting: Array<User>,
@@ -16,14 +17,15 @@ export class BaseStation {
     success: Array<User>,
     collision: Array<User>,
   }> = [];
-  collisionHistory: Array<User> = [];
 
-  flatHistory:{
-    collision:Array<User>,
-    success:Array<User>,
-    waiting:Array<User>,
-    failed:Array<User>,
-  }
+  flatHistory: {
+    collision: Array<User>,
+    success: Array<User>,
+    backOff: Array<any>,
+    failed: Array<User>,
+    retransmission: Array<User>,
+  } =
+    {collision: [], success: [], backOff: [], failed: [], retransmission: []};
 
 
   constructor() {
@@ -67,14 +69,19 @@ export class BaseStation {
           this.params.CDMALimits.RT)
       );
 
-      let props: Props = {maxNbTrans: 0, type: null};
+      let props: Props = {type: null, fileSize: 0};
 
       if (code >= 1 && code < this.params.CDMALimits.RT) {
         props.type = "RT";
+        props.fileSize = 10;
       } else if (code > this.params.maxNbTrans.RT && code <= this.params.CDMALimits.NRT) {
         props.type = "NRT";
+        //picking a random file size to download(between quarter poolSize and poolSize)
+        props.fileSize = Utils.random(this.params.poolSize / 2, this.params.poolSize);
       } else {
         props.type = "BE";
+        //picking a random file size to download(between quarter poolSize and poolSize same as NRT)
+        props.fileSize = Utils.random(this.params.poolSize / 2, this.params.poolSize);
       }
 
       let user: User = {
@@ -82,7 +89,9 @@ export class BaseStation {
         code: code,
         backOff: 0,
         type: props.type,
-        nbRTrans: 0
+        nbRTrans: 0,
+        isSuccess: false,
+        fileSize: props.fileSize
       };
       this.usersList.push(user);
     }
@@ -91,7 +100,7 @@ export class BaseStation {
   connectUsers() {
     this.genUsers();
     this.initHistory();
-    this.checkCollision();
+    this.runCycles();
 
   }
 
@@ -101,152 +110,24 @@ export class BaseStation {
     }
   }
 
-  checkCollision() {
-    // let n = Utils.random(1, this.params.CDMALimits.BE);
-    // for (let i = 0; i < n; i++) {
-
-    // this.usersList.forEach((fv, fi, fArray) => {
-    //   this.usersList.forEach((sv, si, sArray) => {
-    //     if (fArray[fi].code == sArray[si].code) {
-    //       this.usersList[fi].backOff--;
-    //       this.usersList[fi].isInCollision = true;
-    //
-    //     } else {
-    //       this.usersList[fi].isSuccess = true;
-    //     }
-    //   });
-    // });
-    //   for (let c=0 ; c<this.params.nbOfCycles;c++) {
-    //     // let n = Utils.random(0, this.params.nbOfUsers);
-    //     let n =600;
-    //
-    //     let start=n*c;
-    //     let end= n*(c+1);
-    //
-    //   for (let userOne of this.usersList.slice(start,end)) {
-    //
-    //     for (let userTwo of this.usersList.slice(start,end)) {
-    //       if (userOne.code == userTwo.code && userOne.id != userTwo.id) {
-    //         if (userOne.backOff == 0) {
-    //           // Change User code
-    //           userOne.code = this.remakeCDMACode(userOne);
-    //           if (userOne.type == "RT" && userOne.nbRTrans > this.params.maxNbTrans.RT) {
-    //             userOne.isSuccess = false;
-    //           } else if (userOne.type == "NRT" && userOne.nbRTrans > this.params.maxNbTrans.NRT) {
-    //             userOne.isSuccess = false;
-    //           } else if (userOne.type == "BE" && userOne.nbRTrans > this.params.maxNbTrans.BE) {
-    //             userOne.isSuccess = false;
-    //           }
-    //           else {
-    //             userOne.nbRTrans++;
-    //             userOne.isInCollision = true;
-    //             userOne.backOff = Utils.random(3,5);
-    //             // userTwo.isSuccess = false;
-    //           }
-    //         } else if(userOne.backOff>0) {
-    //          userOne.backOff--;
-    //         }
-    //       } else {
-    //         userOne.isSuccess = true;
-    //
-    //
-    //       }
-    //     }
-    //   }
-    // }
-
-
-    // for (let c = 0; c < this.params.nbOfCycles; c++) {
-    // let n = Utils.random(0, this.params.nbOfUsers);
-    // let n = 60;
-
-    // let start = n * c;
-    // let end = n * (c + 1);
-    // let limit = Utils.random(0, this.usersList.length);
-    // let end = Utils.random(0,this.usersList.length)
-
-    // for (let userOne of this.usersList) {
-    //   for (let userTwo of this.usersList) {
-    //     if (userOne.code == userTwo.code && userOne.id != userTwo.id && userOne.isSuccess=='notYet') {
-    //       if (userOne.backOff == 0 ) {
-    //
-    //         // Change User code
-    //         userOne.code = this.remakeCDMACode(userOne);
-    //         if (userOne.type == "RT" && userOne.nbRTrans > this.params.maxNbTrans.RT) {
-    //           userOne.isSuccess = 'false';
-    //         } else if (userOne.type == "NRT" && userOne.nbRTrans > this.params.maxNbTrans.NRT) {
-    //           userOne.isSuccess = 'false';
-    //         } else if (userOne.type == "BE" && userOne.nbRTrans > this.params.maxNbTrans.BE) {
-    //           userOne.isSuccess = 'false';
-    //         }
-    //         else {
-    //           console.log('retransmission');
-    //           userOne.nbRTrans++;
-    //           userOne.isInCollision = true;
-    //           userOne.backOff = Utils.random(3, 5);
-    //           // userTwo.isSuccess = false;
-    //         }
-    //       } else if (userOne.backOff > 0) {
-    //         userOne.backOff--;
-    //       }
-    //     } else if (userOne.code != userTwo.code){
-    //       userOne.isSuccess = 'true';
-    //
-    //
-    //     }
-    //   }
-    // }
-
-
-    // }
-    // for (let userOne of this.usersList) {
-    //   if (userOne.backOff>0){
-    //     userOne.backOff--
-    //   }
-    //   for (let userTwo of this.usersList) {
-    //     if(userOne.isSuccess=='notYet'){
-    //       if(userOne.code == userTwo.code && userOne!=userTwo){
-    //         userOne.isInCollision=true;
-    //         userTwo.isInCollision=true;
-    //         userOne.nbRTrans++;
-    //         userTwo.nbRTrans++;
-    //         if (userOne.nbRTrans>2){
-    //           userOne.isSuccess='false';
-    //         }
-    //         if (userTwo.nbRTrans>2){
-    //           userTwo.isSuccess='false';
-    //         }
-    //       }else {
-    //         userOne.isSuccess='true';
-    //       }
-    //     }
-    //   }
-    //
-    // }
-
-    // }
-
-    // }
-
+  runCycles() {
 
     for (let c = 0; c < this.params.nbOfCycles; c++) {
 
-
-
-      // let start = position;
-      // while (position <= this.usersList.length) {
-      //   position = position + n;
-      // }
-      // let item = this.history.filter(item=>item.cycle==c);
-
-
-      this.recordHistory(c);
-
+      this.resources = this.params.poolSize;
 
 //========== Processing Waiting list ==========
       for (let user of this.waitingList) {
         if (this.isTimeout(user)) {
-          //If user is timedOut then it will be moved from waiting to failed
+
+          //=====Fail Statistics =====
+          //flat
+          this.flatHistory.failed.push(user);
+          //=====End Fail Statistics=====
+
+
+          //If user is timedOut means it won't try to connect again
+          //So it will be moved from waiting to failed
           this.failedList.push(user);
           this.waitingList = Utils.rmv(user, this.waitingList);
 
@@ -257,6 +138,10 @@ export class BaseStation {
             //this mean the  user will attempt to communicate
             //so retransmission number will increase
             user.nbRTrans++;
+            //=====Retransmission Statistics======
+            this.flatHistory.retransmission.push(user);
+            //=====End Retransmission Statistics======
+
             // Then it will be moved from waiting to ongoing users
             this.ongoingUsers.push(user);
             this.waitingList = Utils.rmv(user, this.waitingList);
@@ -264,10 +149,23 @@ export class BaseStation {
         }
       }
 
-//========== Processing Successful list (!!not finished yet don't put it in report!!)==========
-      //!!the Resource management not implemented yet so user will go straight to ongoing!!
+//========== Processing Successful list(Resources Management)==========
+
+
+      let count = Utils.countBy(this.successUsers, 'type');
+
+      //******Managing RealTime ******
       for (let user of this.successUsers) {
-        if (1 == 1) {
+        user.isSuccess = true;//Confirming success, so user won't get in collision again
+        user.nbRTrans = 0;//resetting retransmission number
+        if (this.resources > 0) {
+          if (user.type == 'RT') {
+            user.fileSize = user.fileSize - 10;
+            this.resources = this.resources - 10;
+          }
+        }
+
+        if (user.fileSize >= 0) {
           //If user didn't finished yet communication will be moved to ongoing users
           this.ongoingUsers.push(user);
           this.successUsers = Utils.rmv(user, this.successUsers);
@@ -277,11 +175,39 @@ export class BaseStation {
         }
 
       }
+      //****** Managing Non-RealTime & Best Effort ******
+      for (let user of this.successUsers) {
+        user.isSuccess = true;//Confirming success, so user won't get in collision again
+        user.nbRTrans = 0;//resetting retransmission number
 
+        if (this.resources > 0) {
+          if (user.type == 'NRT' || user.type == 'BE') {
+            let debit = (this.resources) / (count.BE + count.NRT);
+            user.fileSize = user.fileSize - debit;
+            this.resources = this.resources - debit;
+          }
+        }
+        if (user.fileSize >= 0) {
+          //If user didn't finished yet communication will be moved to ongoing users
+          this.ongoingUsers.push(user);
+          this.successUsers = Utils.rmv(user, this.successUsers);
+        } else {
+          //Since the user done communicating will be removed definitively
+          this.successUsers = Utils.rmv(user, this.successUsers)
+        }
+      }
 
 
       // A new random number of the user list will as well want to communicate
-      let n = Utils.random(0, Math.floor(this.usersList.length / 3));
+      let n;
+      // n = Utils.random(0, Math.floor(this.usersList.length));
+      if(!Utils.isOdd(this.usersList.length)){
+        n = Utils.random(0, Math.floor(this.usersList.length /2));
+        // console.log('odd',this.usersList.length)
+      }else {
+        n = Utils.random(0,this.usersList.length);
+        // console.log('even',this.usersList.length);
+      }
       //So were moving them to ongoing
       this.ongoingUsers = this.usersList.slice(0, n);
       this.usersList = this.usersList.slice(n, this.usersList.length);
@@ -289,14 +215,17 @@ export class BaseStation {
       // Now time to check for collisions
       for (let userOne of this.ongoingUsers) {
         for (let userTwo of this.ongoingUsers) {
-          if (userOne.code == userTwo.code && userOne.id != userTwo.id) {
+          if (userOne.code == userTwo.code && userOne.id != userTwo.id && !userOne.isSuccess) {
             //This means we have 2 different users have the same C.D.M.A code
 
 
-            //this for statistics purposes
-            this.collisionHistory.push(userOne);
+            //=====Collision Statistics=====
+            //Flat history
+            this.flatHistory.collision.push(userOne);
+            //Cycle history
             let item = this.history.filter(item => item.cycle == c);
             item[0].collision.push(userOne);
+            //=====End Collision Statistics=====
 
 
             //this mean the user has no longer a unique C.D.M.A code
@@ -304,7 +233,14 @@ export class BaseStation {
             this.successUsers = Utils.rmv(userOne, this.successUsers);
 
             //Now this user will take a random backOff and gets a new C.D.M.A code and moved to waiting
-            userOne.backOff = Utils.random(3, 7);
+
+            let backOff= Utils.random(3, 7);
+            userOne.backOff =backOff;
+            //=====BackOff Statistics=====
+            //flat history
+            this.flatHistory.backOff.push({type:userOne.type,backOff:backOff});
+            //=====End BackOff Statistics =====
+
             userOne.code = this.remakeCDMACode(userOne);
             this.waitingList.push(userOne);
             this.ongoingUsers = Utils.rmv(userOne, this.ongoingUsers);
@@ -312,8 +248,12 @@ export class BaseStation {
 
           } else if (userOne.id != userTwo.id) {
             //Until now the user have a unique C.D.M.A code, so it will be copied to successful list
-            this.usersList.push(userOne);
+            this.successUsers.push(userOne);
 
+            //=====Success Statistics=====
+            //Flat history
+            this.flatHistory.success.push(userOne);
+            //=====End Success Statistics=====
           }
         }
       }
@@ -367,8 +307,8 @@ export interface Params {
 }
 
 interface Props {
-  maxNbTrans: number,
-  type: String
+  type: String,
+  fileSize: number
 
 }
 
@@ -385,7 +325,7 @@ interface History {
 export interface Events {
   collisions: number,
   backOffs: number,
-  attempts: number,
+  reTransmission: number,
   success: number,
   canceled: number,
 }
@@ -396,4 +336,17 @@ export interface Stats {
     NRT: Events,
     BE: Events
   }
+}
+
+export interface FlatHistory {
+  collision: Array<User>,
+  success: Array<User>,
+  backOff: Array<User>,
+  failed: Array<User>,
+  retransmission: Array<User>,
+}
+
+export interface Media {
+  size: number,
+  name: String
 }
