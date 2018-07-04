@@ -20,7 +20,7 @@ declare let Chart: any;
 export class HomeComponent implements OnInit {
   params: Params = {
     nbOfUsers: 201,
-    nbOfCycles: 500,
+    nbOfCycles: 200,
     CDMALimits: {
       RT: 75,
       NRT: 175,
@@ -41,17 +41,22 @@ export class HomeComponent implements OnInit {
       BE: {collisions: 0, reTransmission: 0, backOffs: 0, success: 0, canceled: 0}
     }
   };
+  cycleStats:CycleStats={
+    collision:{RT:[],NRT:[],BE:[]},
+    failed:{RT:[],NRT:[],BE:[]},
+    backOff:{RT:[],NRT:[],BE:[]},
+    success:{RT:[],NRT:[],BE:[]},
+  };
 
 
-list=new Array([]);
+defZoom:number=this.params.nbOfCycles-Math.floor(this.params.nbOfCycles/1.2);
   constructor() {
   }
 
   ngOnInit() {
     this.initUI();
     this.RunSimulation();
-    this.renderCharts(this.stats);
-    // this.test();
+    console.log(Utils.iniCycle(this.params.nbOfCycles))
   }
 
   // test() {
@@ -86,6 +91,7 @@ list=new Array([]);
     bs.params = this.params;
     bs.connectUsers();
     this.initialStats(bs);
+    this.runCycleStats(bs);
   }
 
   initResult() {
@@ -95,7 +101,14 @@ list=new Array([]);
         NRT: {collisions: 0, reTransmission: 0, backOffs: 0, success: 0, canceled: 0},
         BE: {collisions: 0, reTransmission: 0, backOffs: 0, success: 0, canceled: 0}
       }
-    }
+    };
+
+    // this.cycleStats={
+    //   collision:{RT:[],NRT:[],BE:[]},
+    //   failed:{RT:[],NRT:[],BE:[]},
+    //   backOff:{RT:[],NRT:[],BE:[]},
+    //   success:{RT:[],NRT:[],BE:[]},
+    // }
   }
 
   initialStats(bs: BaseStation) {
@@ -162,6 +175,32 @@ list=new Array([]);
   }
 
 
+  runCycleStats(bs:BaseStation){
+    for(let cycle of bs.history){
+      let count=Utils.countBy(cycle.success,'type');
+      this.cycleStats.success.RT.push(count.RT);
+      this.cycleStats.success.NRT.push(count.NRT);
+      this.cycleStats.success.BE.push(count.BE);
+
+      count=Utils.countBy(cycle.collision,'type');
+      this.cycleStats.collision.RT.push(count.RT);
+      this.cycleStats.collision.NRT.push(count.NRT);
+      this.cycleStats.collision.BE.push(count.BE);
+
+      count=Utils.countBy(cycle.backOffs,'type');
+      this.cycleStats.backOff.RT.push(count.RT);
+      this.cycleStats.backOff.NRT.push(count.NRT);
+      this.cycleStats.backOff.BE.push(count.BE);
+
+      count=Utils.countBy(cycle.failed,'type');
+      this.cycleStats.failed.RT.push(count.RT);
+      this.cycleStats.failed.NRT.push(count.NRT);
+      this.cycleStats.failed.BE.push(count.BE);
+    }
+// console.log(bs.history)
+    console.log(this.cycleStats)
+  }
+
 //UI
   displayInitStats() {
     $('.sidebar.bottom').transition('fade in');
@@ -192,26 +231,28 @@ list=new Array([]);
 
   }
 
-  backToGraph() {
+  goToGraph(type) {
     $('.sidebar.top').sidebar({
       "transition": "scale out",
     }).sidebar('hide').sidebar({
       onHidden: $('.mainSegment').transition({
         animation: "fade out",
-        onHidden: $('.charts').transition({duration: '1s'})
+        onHidden: $(type).transition({duration: '1s'})
       })
       // .transition({
       // "onComplete":$('.charts').transition('fade in')
       // })
     });
-    this.renderCharts(this.stats)
+
+
+    this.renderCharts(this.stats,this.cycleStats,this.defZoom)
   }
 
-  renderCharts(stats) {
+  renderCharts(stats:Stats,cycleStats:CycleStats,zoom) {
 
     let pie = $('.pieChart');
 
-    let choices = $('#pieStatsChoice');
+    let pieChoices = $('#pieStatsChoice');
     let pieInitData = [0, 0, 0];
 
 
@@ -245,11 +286,11 @@ list=new Array([]);
         }
       }
     });
-    let choice = "reTransmission";
-    choices.change(function () {
-      choice = this.value;
+    let pieChoice = "reTransmission";
+    pieChoices.change(function () {
+      pieChoice = this.value;
 
-      switch (choice) {
+      switch (pieChoice) {
         case ("success"): {
           pieChart.config.data.datasets[0].data=[stats.user.RT.success,stats.user.NRT.success,stats.user.BE.success];
           break;
@@ -276,71 +317,29 @@ list=new Array([]);
     });
 
 
-
-
     let line = $('.lineChart');
-    // let lineChart = new Chart(line, {
-    //   type: 'bar',
-    //   data: {
-    //     labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-    //     datasets: [{
-    //       label: '# of Votes',
-    //       data: [12, 19, 3, 5, 2, 3],
-    //       backgroundColor: [
-    //         'rgba(255, 99, 132, 0.2)',
-    //         'rgba(54, 162, 235, 0.2)',
-    //         'rgba(255, 206, 86, 0.2)',
-    //         'rgba(75, 192, 192, 0.2)',
-    //         'rgba(153, 102, 255, 0.2)',
-    //         'rgba(255, 159, 64, 0.2)'
-    //       ],
-    //       borderColor: [
-    //         'rgba(255,99,132,1)',
-    //         'rgba(54, 162, 235, 1)',
-    //         'rgba(255, 206, 86, 1)',
-    //         'rgba(75, 192, 192, 1)',
-    //         'rgba(153, 102, 255, 1)',
-    //         'rgba(255, 159, 64, 1)'
-    //       ],
-    //       borderWidth: 1
-    //     }]
-    //   },
-    //   options: {
-    //     scales: {
-    //       yAxes: [{
-    //         ticks: {
-    //           beginAtZero: true
-    //         }
-    //       }]
-    //     }
-    //   }
-    // });
-
-
     let config = {
       type: 'line',
       data: {
-        labels: ['1', '2', '3', '4', '5', '6', '7'],
+        labels: Utils.iniCycle(zoom),
         datasets: [{
           label: 'RealTime',
           backgroundColor: 'rgba(255, 99, 132, 0.2)',
           borderColor: 'rgba(255,99,132,1)',
-          data: [5,8,9],
+          data: cycleStats.success.RT,
           fill: false,
         }, {
           label: 'Non RealTime',
           fill: false,
           backgroundColor: 'rgba(54, 162, 235, 0.2)',
           borderColor: 'rgba(54, 162, 235, 1)',
-          data: [8,9,4
-          ],
+          data: cycleStats.success.NRT,
         }, {
           label: 'Best Effort',
           fill: false,
           backgroundColor: 'rgba(255, 206, 86, 0.2)',
           borderColor: 'rgba(255, 206, 86, 1)',
-          data: [5,6,4
-          ],
+          data: cycleStats.success.BE,
         }]
 
       },
@@ -370,20 +369,85 @@ list=new Array([]);
             display: true,
             scaleLabel: {
               display: true,
-              labelString: 'Value'
+              labelString: 'Ongoing Communications',
             }
           }]
         }
       }
     };
 
-    let lineChart =new Chart(line,config);
+    let lineCycleChart =new Chart(line,config);
+
+    let lineCyclesChoices = $('#lineCyclesChoices');
+    let lineCycleChoice = "success";
+    lineCyclesChoices.change(function () {
+      lineCycleChoice = this.value;
+      console.log(this.value);
+
+      switch (lineCycleChoice) {
+        case ("success"): {
+
+          lineCycleChart.config.data.datasets[0].data=cycleStats.success.RT;
+          lineCycleChart.config.data.datasets[1].data=cycleStats.success.NRT;
+          lineCycleChart.config.data.datasets[2].data=cycleStats.success.BE;
+          lineCycleChart.options.scales.yAxes[0].scaleLabel.labelString='Ongoing Communications';
 
 
+          break;
+        }
+        case ("failed"): {
+          lineCycleChart.config.data.datasets[0].data=cycleStats.failed.RT;
+          lineCycleChart.config.data.datasets[1].data=cycleStats.failed.NRT;
+          lineCycleChart.config.data.datasets[2].data=cycleStats.failed.BE;
+          lineCycleChart.options.scales.yAxes[0].scaleLabel.labelString='Failed Communications';
+          break;
+        }
+        case ("backOff"): {
+          lineCycleChart.config.data.datasets[0].data=cycleStats.backOff.RT;
+          lineCycleChart.config.data.datasets[1].data=cycleStats.backOff.NRT;
+          lineCycleChart.config.data.datasets[2].data=cycleStats.backOff.BE;
+          lineCycleChart.options.scales.yAxes[0].scaleLabel.labelString='BackOffs Value';
+          break;
+        }
+        case ("collision"): {
+          lineCycleChart.config.data.datasets[0].data=cycleStats.collision.RT;
+          lineCycleChart.config.data.datasets[1].data=cycleStats.collision.NRT;
+          lineCycleChart.config.data.datasets[2].data=cycleStats.collision.BE;
+          lineCycleChart.options.scales.yAxes[0].scaleLabel.labelString='Number of collisions';
+          break;
+        }
+        default: {
+          lineCycleChart.config.data.datasets[0].data=cycleStats.success.RT;
+          lineCycleChart.config.data.datasets[1].data=cycleStats.success.NRT;
+          lineCycleChart.config.data.datasets[2].data=cycleStats.success.BE;
+          lineCycleChart.options.scales.yAxes[0].scaleLabel.labelString='Ongoing Communications';
+          break;
+        }
+      }
+      lineCycleChart.update();
+
+    });
+
+
+
+    let zoomValue = $('#zoomValue');
+    zoomValue.change(function () {
+      zoom = this.value;
+      lineCycleChart.data.labels=Utils.iniCycle(zoom);
+      lineCycleChart.update();
+
+    });
 
 
 
   }
 
 
+}
+
+interface CycleStats {
+  collision:{RT:Array<number>,NRT:Array<number>,BE:Array<number>},
+  success:{RT:Array<number>,NRT:Array<number>,BE:Array<number>},
+  failed:{RT:Array<number>,NRT:Array<number>,BE:Array<number>},
+  backOff:{RT:Array<number>,NRT:Array<number>,BE:Array<number>},
 }

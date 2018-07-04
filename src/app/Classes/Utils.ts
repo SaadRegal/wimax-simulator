@@ -45,5 +45,36 @@ switch (query){
 return count;
   }
 
+
+
+  static removeDuplicates(originalArray, prop) {
+    let newArray = [];
+    let lookupObject  = {};
+
+    for(var i in originalArray) {
+      lookupObject[originalArray[i][prop]] = originalArray[i];
+    }
+
+    for(i in lookupObject) {
+      newArray.push(lookupObject[i]);
+    }
+    return newArray;
+  }
+
+  static iniCycle(nbCycle){
+    // let arr:Array<number>=[];
+    // for(let i;i<=nbCycle;i++){
+    //   i++;
+    //   arr.push(i);
+    // }
+    // console.log(arr)
+    // return arr
+    const range = (start, end) => Array.from({length: (end - start)}, (v, k) => k + start);
+
+    return range(0,nbCycle);
+}
+
+
+
 }
 

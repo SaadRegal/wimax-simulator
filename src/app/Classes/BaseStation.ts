@@ -6,16 +6,16 @@ export class BaseStation {
   failedList: Array<User> = [];
   ongoingUsers: Array<User> = [];
   successUsers: Array<User> = [];
-  attempts: number;
   backOff: number;
   params: Params;
   resources: number;
   history: Array<{
     cycle: number,
-    waiting: Array<User>,
     failed: Array<User>,
     success: Array<User>,
     collision: Array<User>,
+    backOffs: Array<any>,
+    reTrans: Array<User>,
   }> = [];
 
   flatHistory: {
@@ -23,9 +23,11 @@ export class BaseStation {
     success: Array<User>,
     backOff: Array<any>,
     failed: Array<User>,
-    retransmission: Array<User>,
+    retransmission: Array<any>,
   } =
     {collision: [], success: [], backOff: [], failed: [], retransmission: []};
+
+
 
 
   constructor() {
@@ -106,40 +108,42 @@ export class BaseStation {
 
   initHistory() {
     for (let i = 0; i < this.params.nbOfCycles; i++) {
-      this.history.push({cycle: i, success: [], waiting: [], failed: [], collision: []});
+      this.history.push({cycle: i, success: [], backOffs: [], failed: [], collision: [],reTrans:[]});
     }
   }
 
   runCycles() {
 
     for (let c = 0; c < this.params.nbOfCycles; c++) {
-
-      this.resources = this.params.poolSize;
-
 //========== Processing Waiting list ==========
       for (let user of this.waitingList) {
         if (this.isTimeout(user)) {
 
           //=====Fail Statistics =====
-          //flat
+          //flat history
           this.flatHistory.failed.push(user);
+          //Cycle History
+          let item = this.history.filter(item => item.cycle == c);
+          item[0].failed = item[0].failed.concat(this.failedList);
           //=====End Fail Statistics=====
-
 
           //If user is timedOut means it won't try to connect again
           //So it will be moved from waiting to failed
           this.failedList.push(user);
           this.waitingList = Utils.rmv(user, this.waitingList);
-
         } else {
           if (user.backOff > 0) {
             user.backOff--;
           } else if (user.backOff == 0) {
-            //this mean the  user will attempt to communicate
+            //this means that  the  user will attempt to communicate
             //so retransmission number will increase
             user.nbRTrans++;
             //=====Retransmission Statistics======
-            this.flatHistory.retransmission.push(user);
+            //flat history
+            this.flatHistory.retransmission.push({type:user.type,nbRTrans:user.nbRTrans});
+            //Cycle history
+            let item = this.history.filter(item => item.cycle == c);
+            item[0].reTrans.push(user);
             //=====End Retransmission Statistics======
 
             // Then it will be moved from waiting to ongoing users
@@ -150,25 +154,36 @@ export class BaseStation {
       }
 
 //========== Processing Successful list(Resources Management)==========
-
+      this.resources = this.params.poolSize;
+      //=====Success Statistics=====
+      //Cycles history
+      let item = this.history.filter(item => item.cycle == c);
+      item[0].success = item[0].success.concat(this.successUsers);
+      //=====End Success Statistics=====
+      for(let user of this.successUsers){
+        user.isSuccess = true;//Confirming success, so user won't get in collision again
+        user.nbRTrans = 0;//resetting retransmission number
+        //=====Success Statistics=====
+        //Flat history
+        this.flatHistory.success.push(user);
+        //=====End Success Statistics=====
+      }
 
       let count = Utils.countBy(this.successUsers, 'type');
 
       //******Managing RealTime ******
       for (let user of this.successUsers) {
-        user.isSuccess = true;//Confirming success, so user won't get in collision again
-        user.nbRTrans = 0;//resetting retransmission number
         if (this.resources > 0) {
           if (user.type == 'RT') {
-            user.fileSize = user.fileSize - 10;
             this.resources = this.resources - 10;
           }
         }
-
         if (user.fileSize >= 0) {
           //If user didn't finished yet communication will be moved to ongoing users
-          this.ongoingUsers.push(user);
-          this.successUsers = Utils.rmv(user, this.successUsers);
+
+          user.fileSize = user.fileSize - 10;
+          // this.ongoingUsers.push(user);
+          // this.successUsers = Utils.rmv(user, this.successUsers);
         } else {
           //Since the user done communicating will be removed definitively
           this.successUsers = Utils.rmv(user, this.successUsers)
@@ -177,23 +192,21 @@ export class BaseStation {
       }
       //****** Managing Non-RealTime & Best Effort ******
       for (let user of this.successUsers) {
-        user.isSuccess = true;//Confirming success, so user won't get in collision again
-        user.nbRTrans = 0;//resetting retransmission number
 
         if (this.resources > 0) {
-          if (user.type == 'NRT' || user.type == 'BE') {
-            let debit = (this.resources) / (count.BE + count.NRT);
-            user.fileSize = user.fileSize - debit;
-            this.resources = this.resources - debit;
+          if (user.type != 'RT') {
+            if (user.fileSize >= 0) {
+              let debit = (this.resources) / (count.BE + count.NRT);
+              user.fileSize = user.fileSize - debit;
+              this.resources = this.resources - debit;
+              //If user didn't finished yet communication will be moved to ongoing users
+              // this.ongoingUsers.push(user);
+              // this.successUsers = Utils.rmv(user, this.successUsers);
+            } else {
+              //Since the user done communicating will be removed definitively
+              this.successUsers = Utils.rmv(user, this.successUsers)
+            }
           }
-        }
-        if (user.fileSize >= 0) {
-          //If user didn't finished yet communication will be moved to ongoing users
-          this.ongoingUsers.push(user);
-          this.successUsers = Utils.rmv(user, this.successUsers);
-        } else {
-          //Since the user done communicating will be removed definitively
-          this.successUsers = Utils.rmv(user, this.successUsers)
         }
       }
 
@@ -213,6 +226,7 @@ export class BaseStation {
       this.usersList = this.usersList.slice(n, this.usersList.length);
 
       // Now time to check for collisions
+      let successCandidates:Array<User>=[];
       for (let userOne of this.ongoingUsers) {
         for (let userTwo of this.ongoingUsers) {
           if (userOne.code == userTwo.code && userOne.id != userTwo.id && !userOne.isSuccess) {
@@ -230,7 +244,8 @@ export class BaseStation {
 
             //this mean the user has no longer a unique C.D.M.A code
             // so it will be removed from successful list
-            this.successUsers = Utils.rmv(userOne, this.successUsers);
+            // this.successUsers = Utils.rmv(userOne, this.successUsers);
+           successCandidates = Utils.rmv(userOne, successCandidates);
 
             //Now this user will take a random backOff and gets a new C.D.M.A code and moved to waiting
 
@@ -239,24 +254,27 @@ export class BaseStation {
             //=====BackOff Statistics=====
             //flat history
             this.flatHistory.backOff.push({type:userOne.type,backOff:backOff});
+            //Cycles history
+            item = this.history.filter(item => item.cycle == c);
+            item[0].backOffs.push({type:userOne.type,backOff:backOff});
             //=====End BackOff Statistics =====
-
             userOne.code = this.remakeCDMACode(userOne);
             this.waitingList.push(userOne);
             this.ongoingUsers = Utils.rmv(userOne, this.ongoingUsers);
 
 
-          } else if (userOne.id != userTwo.id) {
-            //Until now the user have a unique C.D.M.A code, so it will be copied to successful list
-            this.successUsers.push(userOne);
 
-            //=====Success Statistics=====
-            //Flat history
-            this.flatHistory.success.push(userOne);
-            //=====End Success Statistics=====
+          } else if (userOne.code != userTwo.code && userOne.id != userTwo.id) {
+            //Until now the user have a unique C.D.M.A code, so it will be copied to successful list
+            // this.successUsers.push(userOne);
+            successCandidates.push(userOne);
+
           }
         }
       }
+      successCandidates=Utils.removeDuplicates(successCandidates,'id');
+      this.successUsers=this.successUsers.concat(successCandidates);
+
 
 
     }
@@ -264,10 +282,11 @@ export class BaseStation {
   }
 
   recordHistory(c) {
-    let item = this.history.filter(item => item.cycle == c);
-    item[0].waiting = item[0].waiting.concat(this.waitingList);
-    item[0].failed = item[0].failed.concat(this.failedList);
-    console.log(item)
+
+    // let item = this.history.filter(item => item.cycle == c);
+    // item[0].waiting = item[0].waiting.concat(this.waitingList);
+    // item[0].failed = item[0].failed.concat(this.failedList);
+    // console.log(item)
   }
 
   renderHistoryData() {
@@ -344,9 +363,4 @@ export interface FlatHistory {
   backOff: Array<User>,
   failed: Array<User>,
   retransmission: Array<User>,
-}
-
-export interface Media {
-  size: number,
-  name: String
 }

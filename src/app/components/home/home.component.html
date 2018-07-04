@@ -1,219 +1,233 @@
 <div>
-<div class="ui top demo sidebar ui segment  scale down">
-  <div class="ui center aligned page grid">
-    <div class="one column row">
-      <div class="sixteen wide column">
-        <h3 class="ui header">Choose an Action</h3>
+  <div class="ui top demo sidebar ui segment  scale down">
+    <div class="ui center aligned page grid">
+      <div class="one column row">
+        <div class="sixteen wide column">
+          <h3 class="ui header">Choose an Action</h3>
+        </div>
       </div>
-    </div>
-    <div class="three column divided row choices">
-      <div class="column link" (click)="this.backToGraph()">
-        Pie chart statistics
-        <img class="ui tiny image centered" src="assets/images/pie.png">
-      </div>
-      <div class="column link" (click)="this.backToGraph()">
-        Hectogramme statistics
-        <img class="ui tiny image centered" src="assets/images/histo2.png">
-      </div>
-      <div class="column link" (click)="this.backToGraph()">
-        Table statistics
-        <img class="ui tiny image centered" src="assets/images/clipboard2.png">
+      <div class="three column divided row choices">
+        <div class="column link" (click)="this.goToGraph('.pieSegment')">
+          Pie chart statistics
+          <img class="ui tiny image centered" src="assets/images/pie.png">
+        </div>
+        <div class="column link" (click)="this.goToGraph('.lineSegment')">
+          Line Chart statistics
+          <img class="ui tiny image centered" src="assets/images/histo2.png">
+        </div>
+        <div class="column link" (click)="this.goToGraph('.summarySegment')">
+          Statistics Summary
+          <img class="ui tiny image centered" src="assets/images/clipboard2.png">
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!--<a (click)="this.toggleTopBar()">submit</a>-->
+  <!--<a (click)="this.toggleTopBar()">submit</a>-->
 
-<div class="ui container" style="margin-top: 5px; display: block">
-  <div class="ui segment">
-    <div class="ui blue center aligned segment">
-      <h2 class="ui header">WiMax 802.16 Simulator</h2>
+  <div class="ui container" style="margin-top: 5px; display: block">
+    <div class="ui segment">
+      <div class="ui blue center aligned segment">
+        <h2 class="ui header">WiMax 802.16 Simulator</h2>
 
-    </div>
+      </div>
 
 
-    <form class="ui form segment mainSegment">
-      <div class="ui three column grid">
-        <div class="row">
-          <div class="column">
-            <h4 class="ui dividing header centered teal">CDMA Length</h4>
-            <div class="field">
-              <label>RealTime</label>
-              <div class="ui input icon">
-                <input [(ngModel)]="params.CDMALimits.RT" placeholder="length value" name="crt" type="text">
+      <form class="ui form segment mainSegment">
+        <div class="ui three column grid">
+          <div class="row">
+            <div class="column">
+              <h4 class="ui dividing header centered teal">CDMA Length</h4>
+              <div class="field">
+                <label>RealTime</label>
+                <div class="ui input icon">
+                  <input [(ngModel)]="params.CDMALimits.RT" placeholder="length value" name="crt" type="text">
+                </div>
               </div>
-            </div>
-            <div class="field">
-              <label>Non-RealTime</label>
-              <div class="ui input icon">
-                <input [(ngModel)]="params.CDMALimits.NRT" placeholder="length value" name="cnrt" type="text">
+              <div class="field">
+                <label>Non-RealTime</label>
+                <div class="ui input icon">
+                  <input [(ngModel)]="params.CDMALimits.NRT" placeholder="length value" name="cnrt" type="text">
+                </div>
               </div>
-            </div>
-            <div class="field">
-              <label>BestEffort</label>
-              <div class="ui input icon">
-                <input [(ngModel)]="params.CDMALimits.BE" placeholder="length value" name="cbe" type="text">
+              <div class="field">
+                <label>BestEffort</label>
+                <div class="ui input icon">
+                  <input [(ngModel)]="params.CDMALimits.BE" placeholder="length value" name="cbe" type="text">
+                </div>
               </div>
-            </div>
 
-          </div>
-          <div class="column">
-            <h4 class="ui dividing header centered teal">Maximal Retransmission number</h4>
-            <div class="field">
-              <label>RealTime</label>
-              <div class="ui input icon">
-                <input [(ngModel)]="params.maxNbTrans.RT" placeholder="value" name="mrrt" type="text">
+            </div>
+            <div class="column">
+              <h4 class="ui dividing header centered teal">Maximal Retransmission number</h4>
+              <div class="field">
+                <label>RealTime</label>
+                <div class="ui input icon">
+                  <input [(ngModel)]="params.maxNbTrans.RT" placeholder="value" name="mrrt" type="text">
+                </div>
+              </div>
+              <div class="field">
+                <label>Non-RealTime</label>
+                <div class="ui input icon">
+                  <input [(ngModel)]="params.maxNbTrans.NRT" placeholder="value" name="mrnrt" type="text">
+                </div>
+              </div>
+              <div class="field">
+                <label>BestEffort</label>
+                <div class="ui input icon">
+                  <input [(ngModel)]="params.maxNbTrans.BE" placeholder="value" name="mrbe" type="text">
+                </div>
               </div>
             </div>
-            <div class="field">
-              <label>Non-RealTime</label>
-              <div class="ui input icon">
-                <input [(ngModel)]="params.maxNbTrans.NRT" placeholder="value" name="mrnrt" type="text">
+            <div class="column">
+              <h4 class="ui dividing header centered violet">Simulation parameters</h4>
+              <div class="field">
+                <label>Number of cycles</label>
+                <div class="ui input icon">
+                  <input [(ngModel)]="params.nbOfCycles" placeholder="length value" name="nbOfCycles" type="text">
+                </div>
               </div>
-            </div>
-            <div class="field">
-              <label>BestEffort</label>
-              <div class="ui input icon">
-                <input [(ngModel)]="params.maxNbTrans.BE" placeholder="value" name="mrbe" type="text">
+              <div class="field">
+                <label>Pool size</label>
+                <div class="ui input icon">
+                  <input [(ngModel)]="params.poolSize" placeholder="length value" name="poolSize" type="text">
+                </div>
               </div>
-            </div>
-          </div>
-          <div class="column">
-            <h4 class="ui dividing header centered violet">Simulation parameters</h4>
-            <div class="field">
-              <label>Number of cycles</label>
-              <div class="ui input icon">
-                <input [(ngModel)]="params.nbOfCycles" placeholder="length value" name="nbOfCycles" type="text">
-              </div>
-            </div>
-            <div class="field">
-              <label>Pool size</label>
-              <div class="ui input icon">
-                <input [(ngModel)]="params.poolSize" placeholder="length value" name="poolSize" type="text">
-              </div>
-            </div>
-            <div class="field">
-              <label>Number of users</label>
-              <div class="ui input icon">
-                <input [(ngModel)]="params.nbOfUsers" placeholder="Nb of users" name="nbUsers" type="number">
+              <div class="field">
+                <label>Number of users</label>
+                <div class="ui input icon">
+                  <input [(ngModel)]="params.nbOfUsers" placeholder="Nb of users" name="nbUsers" type="number">
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
 
-      <div style="margin-bottom: 20px"></div>
-      <div class="ui primary right labeled icon button" (click)="toggleTopBar()">
-        Show Statistics
-        <i class="chart bar outline icon"></i>
-      </div>
-      <div class="ui primary right labeled icon button" (click)="renderCharts(stats)">
-        Show RENDER
-        <i class="chart bar outline icon"></i>
-      </div>
+        <div style="margin-bottom: 20px"></div>
+        <div class="ui primary right labeled icon button" (click)="toggleTopBar()">
+          Show Statistics
+          <i class="chart bar outline icon"></i>
+        </div>
+        <div class="ui primary right labeled icon button" (click)="renderCharts(stats)">
+          Show RENDER
+          <i class="chart bar outline icon"></i>
+        </div>
 
-      <button class="ui icon button teal" (click)="displayInitStats()">
-        <i class="refresh icon"></i>
-      </button>
+        <button class="ui icon button teal" (click)="displayInitStats()">
+          <i class="refresh icon"></i>
+        </button>
 
-    </form>
+      </form>
 
 
+    </div>
   </div>
-</div>
 
-  <div class="ui segment charts" style="display: block">
+  <div class="ui segment pieSegment" style="display: none">
 
     <select class="ui dropdown" id="pieStatsChoice">
       <option value="reTransmission">Re-transmissions</option>
       <option value="success">Success Communications</option>
-      <option value="canceled">Canceled</option>
       <option value="backOff">BackOffs</option>
+      <option value="canceled">Failed Communications</option>
     </select>
-
     <h4 class="ui header">Pie Chart</h4>
 
-    <div style="width: 40%">
+    <div style="width: 60%">
       <canvas class="pieChart"></canvas>
     </div>
 
 
+  </div>
 
+  <div class="ui segment lineSegment" style="display: none">
     <h4 class="ui header">Line Chart</h4>
+    <select class="ui dropdown" id="lineCyclesChoices">
+      <option value="success">Ongoing Communications</option>
+      <option value="backOff">BackOff</option>
+      <option value="collision">Collisions</option>
+      <option value="failed">Failed Communications</option>
+    </select>
 
-    <div style="width: 40%">
+    <div class="field">
+      <div class="ui input icon">
+        <input placeholder="Zoom" id="zoomValue" name="zoom" value="{{defZoom}}" type="number"></div>
+    </div>
+
+    <div style="width: 60%">
       <canvas class="lineChart"></canvas>
     </div>
 
 
-
-
   </div>
 
 
+  <div class="ui segment lineSegment" style="display: none">
+    <h4 class="ui header">Summary</h4>
+  </div>
 
-<div class="ui bottom sidebar static overlay segment" style="max-height: 230px !important; overflow:hidden !important;">
-  <div class="ui active dimmer" id="dimmer">
-    <div class="ui text loader">Calculating</div>
+
+  <div class="ui bottom sidebar static overlay segment"
+       style="max-height: 230px !important; overflow:hidden !important;">
+    <div class="ui active dimmer" id="dimmer">
+      <div class="ui text loader">Calculating</div>
+    </div>
+    <div class="ui toggle checkbox positive floating left" style="position: absolute">
+      <input type="checkbox" id="rtSimulation">
+      <label>Instant Values</label>
+    </div>
+
+    <div class="ui container">
+      <table class="ui definition celled table">
+        <thead>
+        <tr>
+          <th></th>
+          <th>Re-Transmissions</th>
+          <th>Successful Communications on {{params.nbOfCycles}} cycles</th>
+          <th>BackOffs</th>
+          <th>Collisions</th>
+          <th>Canceled</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>RealTime</td>
+          <td>{{this.stats.user.RT.reTransmission}}</td>
+          <td>{{this.stats.user.RT.success}}</td>
+          <td>{{this.stats.user.RT.backOffs}}</td>
+          <td>{{this.stats.user.RT.collisions}}</td>
+          <td>{{this.stats.user.RT.canceled}}</td>
+        </tr>
+        <tr>
+          <td>Non-RealTime</td>
+          <td>{{this.stats.user.NRT.reTransmission}}</td>
+          <td>{{this.stats.user.NRT.success}}</td>
+          <td>{{this.stats.user.NRT.backOffs}}</td>
+          <td>{{this.stats.user.NRT.collisions}}</td>
+          <td>{{this.stats.user.NRT.canceled}}</td>
+        </tr>
+        <tr>
+          <td>Best Effort</td>
+          <td>{{this.stats.user.BE.reTransmission}}</td>
+          <td>{{this.stats.user.BE.success}}</td>
+          <td>{{this.stats.user.BE.backOffs}}</td>
+          <td>{{this.stats.user.BE.collisions}}</td>
+          <td>{{this.stats.user.BE.canceled}}</td>
+        </tr>
+        <tr class="positive">
+          <td>Total</td>
+          <td>
+            {{this.stats.user.RT.reTransmission+this.stats.user.NRT.reTransmission+this.stats.user.BE.reTransmission}}
+          </td>
+          <td>{{this.stats.user.RT.success+this.stats.user.NRT.success+this.stats.user.BE.success}}</td>
+          <td>{{this.stats.user.RT.backOffs+this.stats.user.NRT.backOffs+this.stats.user.BE.backOffs}}</td>
+          <td>{{this.stats.user.RT.collisions+this.stats.user.NRT.collisions+this.stats.user.BE.collisions}}</td>
+          <td>{{this.stats.user.RT.canceled+this.stats.user.NRT.canceled+this.stats.user.BE.canceled}}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-  <div class="ui toggle checkbox positive floating left" style="position: absolute">
-    <input type="checkbox" id="rtSimulation">
-    <label>Instant Values</label>
-  </div>
-  <!--<div class="ui checked checkbox">-->
-    <!--<input type="checkbox" id="rtSimulation" checked="">-->
-    <!--<label>Active</label>-->
-  <!--</div>-->
-  <div class="ui container">
-    <table class="ui definition celled table">
-      <thead>
-      <tr>
-        <th></th>
-        <th>Re-Transmissions</th>
-        <th>Successful Communications on {{params.nbOfCycles}} cycles</th>
-        <th>BackOffs</th>
-        <th>Collisions</th>
-        <th>Canceled</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-        <td>RealTime</td>
-        <td>{{this.stats.user.RT.reTransmission}}</td>
-        <td>{{this.stats.user.RT.success}}</td>
-        <td>{{this.stats.user.RT.backOffs}}</td>
-        <td>{{this.stats.user.RT.collisions}}</td>
-        <td>{{this.stats.user.RT.canceled}}</td>
-      </tr>
-      <tr>
-        <td>Non-RealTime</td>
-        <td>{{this.stats.user.NRT.reTransmission}}</td>
-        <td>{{this.stats.user.NRT.success}}</td>
-        <td>{{this.stats.user.NRT.backOffs}}</td>
-        <td>{{this.stats.user.NRT.collisions}}</td>
-        <td>{{this.stats.user.NRT.canceled}}</td>
-      </tr>
-      <tr>
-        <td>Best Effort</td>
-        <td>{{this.stats.user.BE.reTransmission}}</td>
-        <td>{{this.stats.user.BE.success}}</td>
-        <td>{{this.stats.user.BE.backOffs}}</td>
-        <td>{{this.stats.user.BE.collisions}}</td>
-        <td>{{this.stats.user.BE.canceled}}</td>
-      </tr>
-      <tr class="positive">
-        <td>Total</td>
-        <td>{{this.stats.user.RT.reTransmission+this.stats.user.NRT.reTransmission+this.stats.user.BE.reTransmission}}</td>
-        <td>{{this.stats.user.RT.success+this.stats.user.NRT.success+this.stats.user.BE.success}}</td>
-        <td>{{this.stats.user.RT.backOffs+this.stats.user.NRT.backOffs+this.stats.user.BE.backOffs}}</td>
-        <td>{{this.stats.user.RT.collisions+this.stats.user.NRT.collisions+this.stats.user.BE.collisions}}</td>
-        <td>{{this.stats.user.RT.canceled+this.stats.user.NRT.canceled+this.stats.user.BE.canceled}}</td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
 
 </div>
