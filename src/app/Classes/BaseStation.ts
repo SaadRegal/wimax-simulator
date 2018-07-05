@@ -7,7 +7,13 @@ export class BaseStation {
   ongoingUsers: Array<User> = [];
   successUsers: Array<User> = [];
   backOff: number;
-  params: Params;
+  params: Params={
+    nbOfCycles:0,
+    poolSize:0,
+    nbOfUsers:0,
+    maxNbTrans:{NRT:0,BE:0,RT:0},
+    CDMALimits:{NRT:0,BE:0,RT:0},
+  };
   resources: number;
   history: Array<{
     cycle: number,
@@ -79,11 +85,11 @@ export class BaseStation {
       } else if (code > this.params.maxNbTrans.RT && code <= this.params.CDMALimits.NRT) {
         props.type = "NRT";
         //picking a random file size to download(between quarter poolSize and poolSize)
-        props.fileSize = Utils.random(this.params.poolSize / 2, this.params.poolSize);
+        props.fileSize = Utils.random(this.params.poolSize / 4, this.params.poolSize);
       } else {
         props.type = "BE";
         //picking a random file size to download(between quarter poolSize and poolSize same as NRT)
-        props.fileSize = Utils.random(this.params.poolSize / 2, this.params.poolSize);
+        props.fileSize = Utils.random(this.params.poolSize / 4, this.params.poolSize);
       }
 
       let user: User = {
@@ -178,12 +184,11 @@ export class BaseStation {
             this.resources = this.resources - 10;
           }
         }
-        if (user.fileSize >= 0) {
+        if (user.fileSize > 0) {
           //If user didn't finished yet communication will be moved to ongoing users
 
           user.fileSize = user.fileSize - 10;
-          // this.ongoingUsers.push(user);
-          // this.successUsers = Utils.rmv(user, this.successUsers);
+
         } else {
           //Since the user done communicating will be removed definitively
           this.successUsers = Utils.rmv(user, this.successUsers)
@@ -199,9 +204,6 @@ export class BaseStation {
               let debit = (this.resources) / (count.BE + count.NRT);
               user.fileSize = user.fileSize - debit;
               this.resources = this.resources - debit;
-              //If user didn't finished yet communication will be moved to ongoing users
-              // this.ongoingUsers.push(user);
-              // this.successUsers = Utils.rmv(user, this.successUsers);
             } else {
               //Since the user done communicating will be removed definitively
               this.successUsers = Utils.rmv(user, this.successUsers)

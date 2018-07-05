@@ -6,6 +6,8 @@
           <h3 class="ui header">Choose an Action</h3>
         </div>
       </div>
+
+
       <div class="three column divided row choices">
         <div class="column link" (click)="this.goToGraph('.pieSegment')">
           Pie chart statistics
@@ -29,7 +31,14 @@
     <div class="ui segment">
       <div class="ui blue center aligned segment">
         <h2 class="ui header">WiMax 802.16 Simulator</h2>
-
+        <div class="ui basic button blue" (click)="backToHome()">
+          <i class="icon home"></i>
+          Home
+        </div>
+        <div class="ui basic button blue" (click)="toggleTopBar()">
+          <i class="icon block layout"></i>
+          Menu
+        </div>
       </div>
 
 
@@ -109,10 +118,6 @@
           Show Statistics
           <i class="chart bar outline icon"></i>
         </div>
-        <div class="ui primary right labeled icon button" (click)="renderCharts(stats)">
-          Show RENDER
-          <i class="chart bar outline icon"></i>
-        </div>
 
         <button class="ui icon button teal" (click)="displayInitStats()">
           <i class="refresh icon"></i>
@@ -124,25 +129,25 @@
     </div>
   </div>
 
-  <div class="ui segment pieSegment" style="display: none">
+  <div class="ui segment pieSegment center aligned" style="display: none">
 
     <select class="ui dropdown" id="pieStatsChoice">
-      <option value="reTransmission">Re-transmissions</option>
       <option value="success">Success Communications</option>
+      <option value="reTransmission">Re-transmissions</option>
       <option value="backOff">BackOffs</option>
       <option value="canceled">Failed Communications</option>
     </select>
-    <h4 class="ui header">Pie Chart</h4>
+    <h2 class="ui header">Statistics in Pie Chart </h2>
 
-    <div style="width: 60%">
+    <div style="margin-left: 20%;width: 60%">
       <canvas class="pieChart"></canvas>
     </div>
 
 
   </div>
 
-  <div class="ui segment lineSegment" style="display: none">
-    <h4 class="ui header">Line Chart</h4>
+  <div class="ui segment lineSegment center aligned" style="display: none">
+    <h2 class="ui header">Cycles Statistics</h2>
     <select class="ui dropdown" id="lineCyclesChoices">
       <option value="success">Ongoing Communications</option>
       <option value="backOff">BackOff</option>
@@ -155,7 +160,7 @@
         <input placeholder="Zoom" id="zoomValue" name="zoom" value="{{defZoom}}" type="number"></div>
     </div>
 
-    <div style="width: 60%">
+    <div style="margin-left: 20%;width: 70%">
       <canvas class="lineChart"></canvas>
     </div>
 
@@ -163,8 +168,104 @@
   </div>
 
 
-  <div class="ui segment lineSegment" style="display: none">
-    <h4 class="ui header">Summary</h4>
+  <div class="ui container segment summarySegment" style="display: none">
+    <h1 class="ui header centered">Summary:</h1>
+    <h2 class="ui dividing header">Input</h2>
+    <h3 class="ui dividing centered header teal">Users Properties</h3>
+    <table class="ui definition celled table">
+      <thead>
+      <tr>
+        <th style="width: 200px;"></th>
+        <th>RealTime</th>
+        <th>Non RealTime</th>
+        <th>Best Effort</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>Maximal Retransmission number</td>
+        <td>{{params.maxNbTrans.RT}}</td>
+        <td>{{params.maxNbTrans.NRT}}</td>
+        <td>{{params.maxNbTrans.BE}}</td>
+      </tr>
+      <tr>
+        <td>C.D.M.A length</td>
+        <td>{{params.CDMALimits.RT}}</td>
+        <td>{{params.CDMALimits.NRT}}</td>
+        <td>{{params.CDMALimits.BE}}</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <h3 class="ui dividing centered header violet">Simulation Parameters </h3>
+    <table class="ui definition celled table">
+      <thead>
+      <tr>
+        <th style="width: 200px;"></th>
+        <th>Number Of Cycles</th>
+        <th>Pool size</th>
+        <th>Number of users</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>Value</td>
+        <td>{{params.nbOfCycles}}</td>
+        <td>{{params.poolSize}}</td>
+        <td>{{params.nbOfUsers}}</td>
+      </tr>
+      </tbody>
+    </table>
+    <h2 class="ui dividing header">Output</h2>
+    <h3 class="ui dividing centered header blue">Statistics  </h3>
+    <table class="ui definition celled table">
+      <thead>
+      <tr>
+        <th></th>
+        <th>Re-Transmissions</th>
+        <th>Successful Communications on {{params.nbOfCycles}} cycles</th>
+        <th>BackOffs</th>
+        <th>Collisions</th>
+        <th>Canceled</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>RealTime</td>
+        <td>{{this.stats.user.RT.reTransmission}}</td>
+        <td>{{this.stats.user.RT.success}}</td>
+        <td>{{this.stats.user.RT.backOffs}}</td>
+        <td>{{this.stats.user.RT.collisions}}</td>
+        <td>{{this.stats.user.RT.canceled}}</td>
+      </tr>
+      <tr>
+        <td>Non-RealTime</td>
+        <td>{{this.stats.user.NRT.reTransmission}}</td>
+        <td>{{this.stats.user.NRT.success}}</td>
+        <td>{{this.stats.user.NRT.backOffs}}</td>
+        <td>{{this.stats.user.NRT.collisions}}</td>
+        <td>{{this.stats.user.NRT.canceled}}</td>
+      </tr>
+      <tr>
+        <td>Best Effort</td>
+        <td>{{this.stats.user.BE.reTransmission}}</td>
+        <td>{{this.stats.user.BE.success}}</td>
+        <td>{{this.stats.user.BE.backOffs}}</td>
+        <td>{{this.stats.user.BE.collisions}}</td>
+        <td>{{this.stats.user.BE.canceled}}</td>
+      </tr>
+      <tr class="positive">
+        <td>Total</td>
+        <td>
+          {{this.stats.user.RT.reTransmission+this.stats.user.NRT.reTransmission+this.stats.user.BE.reTransmission}}
+        </td>
+        <td>{{this.stats.user.RT.success+this.stats.user.NRT.success+this.stats.user.BE.success}}</td>
+        <td>{{this.stats.user.RT.backOffs+this.stats.user.NRT.backOffs+this.stats.user.BE.backOffs}}</td>
+        <td>{{this.stats.user.RT.collisions+this.stats.user.NRT.collisions+this.stats.user.BE.collisions}}</td>
+        <td>{{this.stats.user.RT.canceled+this.stats.user.NRT.canceled+this.stats.user.BE.canceled}}</td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 
 
@@ -182,7 +283,7 @@
       <table class="ui definition celled table">
         <thead>
         <tr>
-          <th></th>
+          <th ></th>
           <th>Re-Transmissions</th>
           <th>Successful Communications on {{params.nbOfCycles}} cycles</th>
           <th>BackOffs</th>
@@ -227,6 +328,7 @@
         </tr>
         </tbody>
       </table>
+
     </div>
   </div>
 

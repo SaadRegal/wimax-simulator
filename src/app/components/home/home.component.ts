@@ -19,19 +19,19 @@ declare let Chart: any;
 
 export class HomeComponent implements OnInit {
   params: Params = {
-    nbOfUsers: 201,
-    nbOfCycles: 200,
+    nbOfUsers: 300,
+    nbOfCycles: 300,
     CDMALimits: {
-      RT: 75,
-      NRT: 175,
-      BE: 200
+      RT: 100,
+      NRT: 200,
+      BE: 300
     },
     maxNbTrans: {
       RT: 2,
       NRT: 3,
       BE: 4
     },
-    poolSize:180
+    poolSize:950
   };
 
   stats: Stats = {
@@ -47,29 +47,20 @@ export class HomeComponent implements OnInit {
     backOff:{RT:[],NRT:[],BE:[]},
     success:{RT:[],NRT:[],BE:[]},
   };
+  bs:BaseStation;
 
 
 defZoom:number=this.params.nbOfCycles-Math.floor(this.params.nbOfCycles/1.2);
   constructor() {
   }
 
+  pieChart:any=null;
+  lineCycleChart:any=null;
+
   ngOnInit() {
     this.initUI();
     this.RunSimulation();
-    console.log(Utils.iniCycle(this.params.nbOfCycles))
   }
-
-  // test() {
-  //   let users = [{name: "n1", id: 5}, {name: "n2", id: 6}, {name: "n2", id: 7,}, {name: "n2", id: 8}];
-  //   // let user = {name: "n1", id: 5};
-  //
-  //   users=users.slice(1,2);
-  //
-  //   console.log(users);
-  //
-  //   // users = Utils.rmv(user, users);
-  //
-  // }
 
 
   RunSimulation() {
@@ -87,11 +78,11 @@ defZoom:number=this.params.nbOfCycles-Math.floor(this.params.nbOfCycles/1.2);
 
   start() {
     this.initResult();
-    let bs = new BaseStation();
-    bs.params = this.params;
-    bs.connectUsers();
-    this.initialStats(bs);
-    this.runCycleStats(bs);
+    this.bs = new BaseStation();
+    this.bs.params = this.params;
+    this.bs.connectUsers();
+    this.initialStats();
+    this.runCycleStats();
   }
 
   initResult() {
@@ -103,32 +94,32 @@ defZoom:number=this.params.nbOfCycles-Math.floor(this.params.nbOfCycles/1.2);
       }
     };
 
-    // this.cycleStats={
-    //   collision:{RT:[],NRT:[],BE:[]},
-    //   failed:{RT:[],NRT:[],BE:[]},
-    //   backOff:{RT:[],NRT:[],BE:[]},
-    //   success:{RT:[],NRT:[],BE:[]},
-    // }
+    this.cycleStats={
+      collision:{RT:[],NRT:[],BE:[]},
+      failed:{RT:[],NRT:[],BE:[]},
+      backOff:{RT:[],NRT:[],BE:[]},
+      success:{RT:[],NRT:[],BE:[]},
+    }
   }
 
-  initialStats(bs: BaseStation) {
+  initialStats() {
 
     // =====Statistics visualization=====
 
     //Failed
-    let count = Utils.countBy(bs.flatHistory.failed, "type");
+    let count = Utils.countBy(this.bs.flatHistory.failed, "type");
     this.stats.user.RT.canceled = count.RT;
     this.stats.user.NRT.canceled = count.NRT;
     this.stats.user.BE.canceled = count.BE;
 
     //Collisions
-    count = Utils.countBy(bs.flatHistory.collision, "type");
+    count = Utils.countBy(this.bs.flatHistory.collision, "type");
     this.stats.user.RT.collisions = count.RT;
     this.stats.user.NRT.collisions = count.NRT;
     this.stats.user.BE.collisions = count.BE;
 
     //Success
-    count = Utils.countBy(bs.flatHistory.success, "type");
+    count = Utils.countBy(this.bs.flatHistory.success, "type");
     this.stats.user.RT.success = count.RT;
     this.stats.user.NRT.success = count.NRT;
     this.stats.user.BE.success = count.BE;
@@ -137,7 +128,7 @@ defZoom:number=this.params.nbOfCycles-Math.floor(this.params.nbOfCycles/1.2);
 
 
     // BackOff count
-    for (let user of bs.flatHistory.backOff) {
+    for (let user of this.bs.flatHistory.backOff) {
       if (user.type == 'RT') {
         this.stats.user.RT.backOffs += user.backOff;
       }else
@@ -154,7 +145,7 @@ defZoom:number=this.params.nbOfCycles-Math.floor(this.params.nbOfCycles/1.2);
 
     // Retransmission count
 
-    for (let user of bs.flatHistory.retransmission) {
+    for (let user of this.bs.flatHistory.retransmission) {
       if (user.type == 'RT') {
         this.stats.user.RT.reTransmission += user.nbRTrans;
       }else
@@ -175,8 +166,8 @@ defZoom:number=this.params.nbOfCycles-Math.floor(this.params.nbOfCycles/1.2);
   }
 
 
-  runCycleStats(bs:BaseStation){
-    for(let cycle of bs.history){
+  runCycleStats(){
+    for(let cycle of this.bs.history){
       let count=Utils.countBy(cycle.success,'type');
       this.cycleStats.success.RT.push(count.RT);
       this.cycleStats.success.NRT.push(count.NRT);
@@ -202,14 +193,20 @@ defZoom:number=this.params.nbOfCycles-Math.floor(this.params.nbOfCycles/1.2);
   }
 
 //UI
-  displayInitStats() {
+  showBottomBar(){
     $('.sidebar.bottom').transition('fade in');
+  }
+  hideBottomBar(){
+    $('.sidebar.bottom').transition('fade out');
+  }
+  displayInitStats() {
+    this.showBottomBar();
     this.RunSimulation()
   }
 
   initUI() {
     // $('.ui.checkbox').checkbox();
-    $("input[type='text']").on("focus", () => {
+    $("input[type='text']").on("change", () => {
       // $('.sidebar.bottom').sidebar({"dimPage":"false"}).sidebar('show');
       $('.sidebar.bottom').transition('fade in');
       let check = $('#rtSimulation').is(":checked");
@@ -231,32 +228,53 @@ defZoom:number=this.params.nbOfCycles-Math.floor(this.params.nbOfCycles/1.2);
 
   }
 
+
   goToGraph(type) {
     $('.sidebar.top').sidebar({
       "transition": "scale out",
     }).sidebar('hide').sidebar({
       onHidden: $('.mainSegment').transition({
         animation: "fade out",
-        onHidden: $(type).transition({duration: '1s'})
+        onHidden: $(type).transition({duration: '0.5s'})
       })
-      // .transition({
-      // "onComplete":$('.charts').transition('fade in')
-      // })
     });
+    setTimeout(() => {
+      this.hideBottomBar();
+      this.renderCharts()
+    },600);
 
-
-    this.renderCharts(this.stats,this.cycleStats,this.defZoom)
   }
 
-  renderCharts(stats:Stats,cycleStats:CycleStats,zoom) {
+  backToHome(){
+    $('.summarySegment ,.pieSegment,.lineSegment').transition({
+      duration:'0.3s',
+      animation:'vertical flip out',
+    });
+
+    setTimeout(() => {
+      $('.mainSegment').transition({animation :'vertical flip  in',duration:'1s'})
+    },301);
+  }
+
+  renderCharts() {
+    // this.initResult();
+    // this.initialStats();
+    // this.runCycleStats();
+
+    setTimeout(() => {
+
+    },500);
+
+ this.lineCycleChart=null;
+  this.pieChart=null;
 
     let pie = $('.pieChart');
 
-    let pieChoices = $('#pieStatsChoice');
-    let pieInitData = [0, 0, 0];
+
+    let pieInitData = [this.stats.user.RT.success,this.stats.user.NRT.success,this.stats.user.BE.success];
 
 
-    let pieChart = new Chart(pie, {
+    this.pieChart = new Chart(pie, {
       type: 'pie',
       data: {
         labels: ["RealTime", "Non RealTime", "Best Effort"],
@@ -287,32 +305,34 @@ defZoom:number=this.params.nbOfCycles-Math.floor(this.params.nbOfCycles/1.2);
       }
     });
     let pieChoice = "reTransmission";
-    pieChoices.change(function () {
-      pieChoice = this.value;
+    let pieChoices = $('#pieStatsChoice');
+    pieChoices.change(()=> {
+      pieChoice = $('#pieStatsChoice option:selected').val();
+      // console.log()
 
       switch (pieChoice) {
         case ("success"): {
-          pieChart.config.data.datasets[0].data=[stats.user.RT.success,stats.user.NRT.success,stats.user.BE.success];
+          this.pieChart.config.data.datasets[0].data=[this.stats.user.RT.success,this.stats.user.NRT.success,this.stats.user.BE.success];
           break;
         }
         case ("canceled"): {
-          pieChart.config.data.datasets[0].data=[stats.user.RT.canceled,stats.user.NRT.canceled,stats.user.BE.canceled];
+          this.pieChart.config.data.datasets[0].data=[this.stats.user.RT.canceled,this.stats.user.NRT.canceled,this.stats.user.BE.canceled];
           break;
         }
         case ("backOff"): {
-          pieChart.config.data.datasets[0].data=[stats.user.RT.backOffs,stats.user.NRT.backOffs,stats.user.BE.backOffs];
+          this.pieChart.config.data.datasets[0].data=[this.stats.user.RT.backOffs,this.stats.user.NRT.backOffs,this.stats.user.BE.backOffs];
           break;
         }
         case ("reTransmission"): {
-          pieChart.config.data.datasets[0].data=[stats.user.RT.reTransmission,stats.user.NRT.reTransmission,stats.user.BE.reTransmission];
+          this.pieChart.config.data.datasets[0].data=[this.stats.user.RT.reTransmission,this.stats.user.NRT.reTransmission,this.stats.user.BE.reTransmission];
           break;
         }
         default: {
-          pieChart.config.data.datasets[0].data=[stats.user.RT.reTransmission,stats.user.NRT.reTransmission,stats.user.BE.reTransmission];
+          this.pieChart.config.data.datasets[0].data=[this.stats.user.RT.reTransmission,this.stats.user.NRT.reTransmission,this.stats.user.BE.reTransmission];
           break;
         }
       }
-      pieChart.update();
+      this.pieChart.update();
 
     });
 
@@ -321,41 +341,42 @@ defZoom:number=this.params.nbOfCycles-Math.floor(this.params.nbOfCycles/1.2);
     let config = {
       type: 'line',
       data: {
-        labels: Utils.iniCycle(zoom),
+        labels: Utils.iniCycle(this.defZoom),
         datasets: [{
           label: 'RealTime',
           backgroundColor: 'rgba(255, 99, 132, 0.2)',
           borderColor: 'rgba(255,99,132,1)',
-          data: cycleStats.success.RT,
+          data: this.cycleStats.success.RT,
           fill: false,
         }, {
           label: 'Non RealTime',
           fill: false,
           backgroundColor: 'rgba(54, 162, 235, 0.2)',
           borderColor: 'rgba(54, 162, 235, 1)',
-          data: cycleStats.success.NRT,
+          data: this.cycleStats.success.NRT,
         }, {
           label: 'Best Effort',
           fill: false,
           backgroundColor: 'rgba(255, 206, 86, 0.2)',
           borderColor: 'rgba(255, 206, 86, 1)',
-          data: cycleStats.success.BE,
+          data: this.cycleStats.success.BE,
         }]
 
       },
       options: {
-        responsive: true,
+        // responsive: true,
         title: {
           display: true,
           text: 'Chart.js Line Chart'
         },
         tooltips: {
           mode: 'index',
-          intersect: false,
+          intersect: true,
         },
         hover: {
           mode: 'nearest',
-          intersect: true
+          // intersect: false
+          animationDuration:1000
         },
         scales: {
           xAxes: [{
@@ -376,65 +397,64 @@ defZoom:number=this.params.nbOfCycles-Math.floor(this.params.nbOfCycles/1.2);
       }
     };
 
-    let lineCycleChart =new Chart(line,config);
+    this.lineCycleChart =new Chart(line,config);
 
     let lineCyclesChoices = $('#lineCyclesChoices');
     let lineCycleChoice = "success";
-    lineCyclesChoices.change(function () {
-      lineCycleChoice = this.value;
-      console.log(this.value);
+    lineCyclesChoices.change(()=>{
+      lineCycleChoice = $('#lineCyclesChoices option:selected').val();
 
       switch (lineCycleChoice) {
         case ("success"): {
 
-          lineCycleChart.config.data.datasets[0].data=cycleStats.success.RT;
-          lineCycleChart.config.data.datasets[1].data=cycleStats.success.NRT;
-          lineCycleChart.config.data.datasets[2].data=cycleStats.success.BE;
-          lineCycleChart.options.scales.yAxes[0].scaleLabel.labelString='Ongoing Communications';
+          this.lineCycleChart.config.data.datasets[0].data=this.cycleStats.success.RT;
+          this.lineCycleChart.config.data.datasets[1].data=this.cycleStats.success.NRT;
+          this.lineCycleChart.config.data.datasets[2].data=this.cycleStats.success.BE;
+          this.lineCycleChart.options.scales.yAxes[0].scaleLabel.labelString='Ongoing Communications';
 
 
           break;
         }
         case ("failed"): {
-          lineCycleChart.config.data.datasets[0].data=cycleStats.failed.RT;
-          lineCycleChart.config.data.datasets[1].data=cycleStats.failed.NRT;
-          lineCycleChart.config.data.datasets[2].data=cycleStats.failed.BE;
-          lineCycleChart.options.scales.yAxes[0].scaleLabel.labelString='Failed Communications';
+          this.lineCycleChart.config.data.datasets[0].data=this.cycleStats.failed.RT;
+          this.lineCycleChart.config.data.datasets[1].data=this.cycleStats.failed.NRT;
+          this.lineCycleChart.config.data.datasets[2].data=this.cycleStats.failed.BE;
+          this.lineCycleChart.options.scales.yAxes[0].scaleLabel.labelString='Failed Communications';
           break;
         }
         case ("backOff"): {
-          lineCycleChart.config.data.datasets[0].data=cycleStats.backOff.RT;
-          lineCycleChart.config.data.datasets[1].data=cycleStats.backOff.NRT;
-          lineCycleChart.config.data.datasets[2].data=cycleStats.backOff.BE;
-          lineCycleChart.options.scales.yAxes[0].scaleLabel.labelString='BackOffs Value';
+          this.lineCycleChart.config.data.datasets[0].data=this.cycleStats.backOff.RT;
+          this.lineCycleChart.config.data.datasets[1].data=this.cycleStats.backOff.NRT;
+          this.lineCycleChart.config.data.datasets[2].data=this.cycleStats.backOff.BE;
+          this.lineCycleChart.options.scales.yAxes[0].scaleLabel.labelString='BackOffs Value';
           break;
         }
         case ("collision"): {
-          lineCycleChart.config.data.datasets[0].data=cycleStats.collision.RT;
-          lineCycleChart.config.data.datasets[1].data=cycleStats.collision.NRT;
-          lineCycleChart.config.data.datasets[2].data=cycleStats.collision.BE;
-          lineCycleChart.options.scales.yAxes[0].scaleLabel.labelString='Number of collisions';
+          this.lineCycleChart.config.data.datasets[0].data=this.cycleStats.collision.RT;
+          this.lineCycleChart.config.data.datasets[1].data=this.cycleStats.collision.NRT;
+          this.lineCycleChart.config.data.datasets[2].data=this.cycleStats.collision.BE;
+          this.lineCycleChart.options.scales.yAxes[0].scaleLabel.labelString='Number of collisions';
           break;
         }
         default: {
-          lineCycleChart.config.data.datasets[0].data=cycleStats.success.RT;
-          lineCycleChart.config.data.datasets[1].data=cycleStats.success.NRT;
-          lineCycleChart.config.data.datasets[2].data=cycleStats.success.BE;
-          lineCycleChart.options.scales.yAxes[0].scaleLabel.labelString='Ongoing Communications';
+          this.lineCycleChart.config.data.datasets[0].data=this.cycleStats.success.RT;
+          this.lineCycleChart.config.data.datasets[1].data=this.cycleStats.success.NRT;
+          this.lineCycleChart.config.data.datasets[2].data=this.cycleStats.success.BE;
+          this.lineCycleChart.options.scales.yAxes[0].scaleLabel.labelString='Ongoing Communications';
           break;
         }
       }
-      lineCycleChart.update();
+      this.lineCycleChart.update();
 
     });
 
 
 
     let zoomValue = $('#zoomValue');
-    zoomValue.change(function () {
-      zoom = this.value;
-      lineCycleChart.data.labels=Utils.iniCycle(zoom);
-      lineCycleChart.update();
+    zoomValue.change(()=> {
+      this.defZoom = $('#zoomValue').val();
+      this.lineCycleChart.data.labels=Utils.iniCycle(this.defZoom);
+      this.lineCycleChart.update();
 
     });
 
