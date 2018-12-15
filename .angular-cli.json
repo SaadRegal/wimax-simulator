@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "project": {
-    "name": "wixmax-simulator"
+    "name": "wimax-simulator"
   },
   "apps": [
     {
@@ -20,16 +20,11 @@
       "prefix": "app",
       "styles": [
         "styles.css",
-        "./plugins/css/semantic.min.css",
-        "./plugins/css/calendar.min.css",
-        "./plugins/css/range.css",
-        "./plugins/css/style.css"
+        "./plugins/css/semantic.min.css"
       ],
       "scripts": [
         "./plugins/js/jquery-3.2.1.min.js",
-        "./plugins/js/semantic.min.js",
-        "./plugins/js/calendar.min.js",
-        "./plugins/js/range.js"
+        "./plugins/js/semantic.min.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {
