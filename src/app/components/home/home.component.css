@@ -9,3 +9,7 @@
 .choices>.link{
   transition: all ease-in-out 0.2s;
 }
+
+.segment{
+  transition: all .3s ease-in-out;
+}

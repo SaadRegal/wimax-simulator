@@ -218,7 +218,11 @@ export class HomeComponent implements OnInit {
     }).sidebar('hide').sidebar({
       onHidden: $('.mainSegment').transition({
         animation: 'fade out',
-        onHidden: $(type).transition({duration: '0.5s'})
+        onHide: $('.summarySegment ,.pieSegment,.lineSegment').not(type).transition({
+          duration: '0.3s',
+          animation: 'vertical fade up out',
+        }),
+        onHidden: $(type).transition('fade down in'),
       })
     });
     setTimeout(() => {
@@ -231,11 +235,11 @@ export class HomeComponent implements OnInit {
   backToHome() {
     $('.summarySegment ,.pieSegment,.lineSegment').transition({
       duration: '0.3s',
-      animation: 'vertical flip out',
+      animation: 'vertical fade up out',
     });
 
     setTimeout(() => {
-      $('.mainSegment').transition({animation: 'vertical flip  in', duration: '1s'});
+      $('.mainSegment').transition({animation: 'vertical fade down in', duration: '1s'});
     }, 301);
   }
 
@@ -438,6 +442,7 @@ export class HomeComponent implements OnInit {
 
   }
 }
+
 interface CycleStats {
   collision: { RT: Array<number>, NRT: Array<number>, BE: Array<number> };
   success: { RT: Array<number>, NRT: Array<number>, BE: Array<number> };
