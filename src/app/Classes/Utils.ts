@@ -1,73 +1,69 @@
 export class Utils {
 
-  static isOdd(num) { return num % 2;}
+  static isOdd(num) {
+    return num % 2;
+  }
 
-  static random(min:number, max:number){
+  static random(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  static rmv(doc,array){
+  static rmv(doc, array) {
 
 
+    return array.filter(function (node) {
+      return node.id !== doc.id;
 
-    return array.filter(function(node) {
-      if (node.id == doc.id) {
-        return false;
-      }
-      return true;
     });
 
   }
-  static countBy(userList:Array<User>, query:String){
-    let count={
-      RT:0,
-      NRT:0,
-      BE:0
+
+  static countBy(userList: Array<User>, query: String) {
+    const count = {
+      RT: 0,
+      NRT: 0,
+      BE: 0
     };
-switch (query){
-  case "type":{
-    for(let user of userList){
+    switch (query) {
+      case 'type': {
+        for (const user of userList) {
 
-      if(user.type=="RT"){
-          count.RT++;
-      }
+          if (user.type === 'RT') {
+            count.RT++;
+          }
 
-      if(user.type=="NRT"){
-        count.NRT++;
-      }
+          if (user.type === 'NRT') {
+            count.NRT++;
+          }
 
-      if(user.type=="BE"){
-        count.BE++;
+          if (user.type === 'BE') {
+            count.BE++;
+          }
+        }
       }
     }
+    return count;
   }
-}
-return count;
-  }
-
 
 
   static removeDuplicates(originalArray, prop) {
-    let newArray = [];
-    let lookupObject  = {};
+    const newArray = [];
+    const lookupObject = {};
 
-    for(var i in originalArray) {
+    for (var i in originalArray) {
       lookupObject[originalArray[i][prop]] = originalArray[i];
     }
 
-    for(i in lookupObject) {
+    for (i in lookupObject) {
       newArray.push(lookupObject[i]);
     }
     return newArray;
   }
 
-  static iniCycle(nbCycle){
+  static iniCycle(nbCycle) {
     const range = (start, end) => Array.from({length: (end - start)}, (v, k) => k + start);
 
-    return range(0,nbCycle);
-}
-
-
-
+    return range(0, nbCycle);
+  }
 }
 
