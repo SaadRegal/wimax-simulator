@@ -1,27 +1,31 @@
-# WimaxSimulator
+# WiMAXSimulator
 
-An interactive Simulator of Wimax (a wireless communication standard) based on the IEEE 802.16 set of standards
+> An interactive Simulator of WiMAX (Worldwide Interoperability for Microwave Access, a technology standard for long-range wireless networking) based on the IEEE 802.16 set of standards
 
-## Development server
+## Quick Start
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4202/`. The app will automatically reload if you change any of the source files.
+```bash
+# Install app dependencies 
+npm install
 
-## Code scaffolding
+# Run Angular development server
+# Dev server runs on http://localhost:4202
+ng serve
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+# Build the project. 
+#The build artifacts will be stored in the dist/ directory. Use the -prod flag for a production build. 
+ng build
 
-## Build
+```
+## App Info
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+### Author
+[Saad Regal](https://github.com/SaadRegal/)
 
-## Running unit tests
+### Version
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+1.0.0
 
-## Running end-to-end tests
+### License
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+This project is licensed under the MIT License
