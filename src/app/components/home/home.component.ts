@@ -172,7 +172,6 @@ export class HomeComponent implements OnInit {
       this.cycleStats.failed.NRT.push(count.NRT);
       this.cycleStats.failed.BE.push(count.BE);
     }
-    console.log(this.cycleStats);
   }
 
 // UI
@@ -218,11 +217,11 @@ export class HomeComponent implements OnInit {
     }).sidebar('hide').sidebar({
       onHidden: $('.mainSegment').transition({
         animation: 'fade out',
-        onHide: $('.summarySegment ,.pieSegment,.lineSegment').not(type).transition({
-          duration: '0.3s',
+        onHidden: $('.summarySegment ,.pieSegment,.lineSegment').not(type).transition({
+          duration: '0s',
           animation: 'vertical fade up out',
-        }),
-        onHidden: $(type).transition('fade down in'),
+          onHidden: $(type).transition('fade down in'),
+        })
       })
     });
     setTimeout(() => {
@@ -291,7 +290,6 @@ export class HomeComponent implements OnInit {
     const pieChoices = $('#pieStatsChoice');
     pieChoices.change(() => {
       pieChoice = $('#pieStatsChoice option:selected').val();
-      // console.log()
 
       switch (pieChoice) {
         case ('success'): {
