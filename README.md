@@ -2,6 +2,9 @@
 
 > An interactive Simulator of WiMAX (Worldwide Interoperability for Microwave Access, a technology standard for long-range wireless networking) based on the IEEE 802.16 set of standards
 
+## Demo
+http://wimax.surge.sh/
+
 ## Quick Start
 
 ```bash
